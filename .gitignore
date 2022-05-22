@@ -1,0 +1,15 @@
+# macOS files
+.DS_Store
+
+# VSCode files
+.vscode/
+
+# Python virtual env
+.venv/
+
+# Python caches
+__pycache__
+
+# Other
+junk/
+log.log
