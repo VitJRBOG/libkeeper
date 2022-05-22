@@ -6,6 +6,12 @@ class Note(models.Model):
     title = models.CharField('Title', max_length=50)
     date = models.IntegerField('Creation date')
 
+    def create(self, title: str, date: int):
+        self.title = title
+        self.date = date
+
+        self.save()
+
     def __str__(self) -> str:
         return self.title
 
@@ -20,6 +26,14 @@ class Version(models.Model):
     date = models.IntegerField('Creation date')
     checksum = models.CharField('Checksum', max_length=64)
     note_id = models.IntegerField('Note ID')
+
+    def create(self, text: str, date: int, checksum: str, note_id: int):
+        self.text = text
+        self.date = date
+        self.checksum = checksum
+        self.note_id = note_id
+
+        self.save()
 
     def __str__(self) -> str:
         return str(self.checksum)
