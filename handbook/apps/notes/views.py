@@ -14,7 +14,9 @@ def add(request: HttpRequest) -> JsonResponse:
             'error': f'{request.method} is not allowed.',
         })
 
-    if request.POST.get('text') is None:
+    if request.POST.get('text') is None or \
+       request.POST.get('text') == '' or \
+       request.POST.get('text') == ' ':
         return JsonResponse({
             'status_code': 400,
             'error': 'attribute "text" is required',
