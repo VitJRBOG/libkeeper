@@ -38,6 +38,9 @@ def add(request: HttpRequest) -> JsonResponse:
 
 def __compose_title(text: str) -> str:
     if len(text) > 47:
+        if '\n' in text[:50]:
+            return text[:text.find('\n')]
+
         return f'{text[:46]}...'
     return text
 
