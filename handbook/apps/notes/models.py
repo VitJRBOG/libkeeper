@@ -12,6 +12,9 @@ class Note(models.Model):
 
         self.save()
 
+    def delete(self, id_: int):
+        self.objects.filter(id=id_).delete()
+
     def __str__(self) -> str:
         return self.title
 
