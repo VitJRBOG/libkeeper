@@ -73,6 +73,30 @@ def add(request: HttpRequest) -> JsonResponse:
         'status_code': 200
     })
 
+
+def get_all(request: HttpRequest) -> JsonResponse:
+    if request.method != 'GET':
+        return JsonResponse({
+            'status_code': 400,
+            'error': f'{request.method} is not allowed.',
+        })
+
+    try:
+        queryset = models.Note.objects.values()
+
+        return JsonResponse({
+            'status_code': 200,
+            'count': queryset.count(),
+            'items': list(queryset),
+        })
+    except Exception as e:
+        logging.Logger('critical').critical(e)
+        return JsonResponse({
+            'status_code': 500,
+            'error': 'note selection error',
+        })
+
+
 def __compose_title(text: str) -> tuple[str, str]:
     try:
         if len(text) > 47:
