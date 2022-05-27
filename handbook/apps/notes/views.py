@@ -74,6 +74,82 @@ def add(request: HttpRequest) -> JsonResponse:
     })
 
 
+def update(request: HttpRequest) -> JsonResponse:
+    if request.method != 'POST':
+        return JsonResponse({
+            'status_code': 400,
+            'error': f'{request.method} is not allowed.',
+        })
+
+    id_ = request.POST.get('id')
+    if id_ is None:
+        return JsonResponse({
+                'status_code': 400,
+                'error': '"id" attribute is required',
+            })
+
+    try:
+        note = models.Note.objects.get(id=id_)
+    except models.Note.DoesNotExist:
+        return JsonResponse({
+                'status_code': 404,
+                'error': 'no objects with the specified ID were found',
+            })
+
+    text = request.POST.get('text')
+    if text is None or text == '' or text == ' ':
+        return JsonResponse({
+            'status_code': 400,
+            'error': 'attribute "text" is required',
+        })
+
+    err, title = __compose_title(text)
+    if err != '':
+        return JsonResponse({
+            'status_code': 500,
+            'error': err,
+        })
+
+    err, date = __get_date()
+    if err != '':
+        return JsonResponse({
+            'status_code': 500,
+            'error': err,
+        })
+
+    err, checksum = __gen_checksum(text)
+    if err != '':
+        return JsonResponse({
+            'status_code': 500,
+            'error': err,
+        })
+
+    try:
+        version = models.Version()
+        version.create(text, date, checksum, id_)  # type: ignore
+    except Exception as e:
+        logging.Logger('critical').critical(e)
+        return JsonResponse({
+            'status_code': 500,
+            'error': 'note updation error',
+        })
+
+    try:
+        note.title = title
+        note.save()
+    except Exception as e:
+        logging.Logger('critical').critical(e)
+        version.delete(id_)
+        return JsonResponse({
+            'status_code': 500,
+            'error': 'note updation error',
+        })
+
+    return JsonResponse({
+        'status_code': 200,
+    })
+
+
 def get_all(request: HttpRequest) -> JsonResponse:
     if request.method != 'GET':
         return JsonResponse({
