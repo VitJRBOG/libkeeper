@@ -6,4 +6,5 @@ urlpatterns = [
     path('add', views.add),
     path('update', views.update),
     path('get-all', views.get_all),
+    path('get-by-id', views.get_by_id),
 ]

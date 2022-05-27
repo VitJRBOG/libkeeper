@@ -173,6 +173,36 @@ def get_all(request: HttpRequest) -> JsonResponse:
         })
 
 
+def get_by_id(request: HttpRequest) -> JsonResponse:
+    if request.method != 'GET':
+        return JsonResponse({
+            'status_code': 400,
+            'error': f'{request.method} is not allowed.',
+        })
+
+    id_ = request.GET.get('id')
+
+    try:
+        if id_ is not None:
+            queryset = models.Version.objects.filter(note_id=id_).order_by('date').reverse().values()
+
+            return JsonResponse({
+                'status_code': 200,
+                'items': list(queryset)[0],
+            })
+        else:
+            return JsonResponse({
+                'status_code': 400,
+                'error': '"id" attribute is required',
+            })
+    except Exception as e:
+        logging.Logger('critical').critical(e)
+        return JsonResponse({
+            'status_code': 500,
+            'error': 'note selection error',
+        })
+
+
 def __compose_title(text: str) -> tuple[str, str]:
     try:
         if len(text) > 47:
