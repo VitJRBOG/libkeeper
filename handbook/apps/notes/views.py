@@ -69,8 +69,20 @@ def add(request: HttpRequest) -> JsonResponse:
             'error': 'note creation error',
         })
 
+    version_id = models.Version.objects.last().id  # type: ignore
+
     return JsonResponse({
-        'status_code': 200
+        'status_code': 200,
+        'count': 1,  # because item always single
+        'items': [{
+            'note_id': note_id,
+            'title': title,
+            'date_creation': date,
+            'version_id': version_id,
+            'text': text,
+            'date_modified': date,
+            'checksum': checksum,
+        }]
     })
 
 
