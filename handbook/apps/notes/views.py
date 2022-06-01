@@ -155,6 +155,8 @@ def update(request: HttpRequest) -> JsonResponse:
             'error': 'note updation error',
         })
 
+    version_id = models.Version.objects.last().id  # type: ignore
+
     try:
         note.title = title
         note.save()
@@ -168,6 +170,16 @@ def update(request: HttpRequest) -> JsonResponse:
 
     return JsonResponse({
         'status_code': 200,
+        'count': 1,  # because item always single
+        'items': [{
+            'note_id': note_id,
+            'title': title,
+            'date_creation': date,
+            'version_id': version_id,
+            'text': text,
+            'date_modified': date,
+            'checksum': checksum,
+        }]
     })
 
 
