@@ -215,6 +215,7 @@ def __compose_title(text: str) -> tuple[str, str]:
         logging.Logger('critical').critical(e, exc_info=True)
         return ('error of title composing', '')
 
+
 def __get_date() -> tuple[str, int]:
     try:
         today = datetime.datetime.now()
@@ -223,6 +224,7 @@ def __get_date() -> tuple[str, int]:
     except Exception as e:
         logging.Logger('critical').critical(e, exc_info=True)
         return ('error of getting date', 0)
+
 
 def __gen_checksum(text: str) -> tuple[str, str]:
     try:
