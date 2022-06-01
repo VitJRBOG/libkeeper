@@ -215,20 +215,29 @@ def get_by_id(request: HttpRequest) -> JsonResponse:
 
     id_ = request.GET.get('id')
 
-    try:
-        if id_ is not None:
-            queryset = models.Version.objects.filter(
-                note_id=id_).order_by('date').reverse().values()
+    if id_ is None:
+        return JsonResponse({
+            'status_code': 400,
+            'error': '"id" attribute is required',
+        })
 
-            return JsonResponse({
-                'status_code': 200,
-                'items': list(queryset)[0],
-            })
-        else:
-            return JsonResponse({
-                'status_code': 400,
-                'error': '"id" attribute is required',
-            })
+    note_id: int
+    try:
+        note_id = int(id_)
+    except ValueError:
+        return JsonResponse({
+            'status_code': 400,
+            'error': '"id" attribute must be integer',
+        })
+
+    try:
+        queryset = models.Version.objects.filter(
+            note_id=note_id).order_by('date').reverse().values()
+
+        return JsonResponse({
+            'status_code': 200,
+            'items': list(queryset)[0],
+        })
     except Exception as e:
         logging.Logger('critical').critical(e, exc_info=True)
         return JsonResponse({
