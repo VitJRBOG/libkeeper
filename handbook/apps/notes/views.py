@@ -100,8 +100,17 @@ def update(request: HttpRequest) -> JsonResponse:
             'error': '"id" attribute is required',
         })
 
+    note_id: int
     try:
-        note = models.Note.objects.get(id=id_)
+        note_id = int(id_)
+    except ValueError:
+        return JsonResponse({
+            'status_code': 400,
+            'error': '"id" attribute must be integer',
+        })
+
+    try:
+        note = models.Note.objects.get(id=note_id)
     except models.Note.DoesNotExist:
         return JsonResponse({
             'status_code': 404,
@@ -138,7 +147,7 @@ def update(request: HttpRequest) -> JsonResponse:
 
     try:
         version = models.Version()
-        version.create(text, date, checksum, id_)  # type: ignore
+        version.create(text, date, checksum, note_id)  # type: ignore
     except Exception as e:
         logging.Logger('critical').critical(e, exc_info=True)
         return JsonResponse({
@@ -151,7 +160,7 @@ def update(request: HttpRequest) -> JsonResponse:
         note.save()
     except Exception as e:
         logging.Logger('critical').critical(e, exc_info=True)
-        version.delete(id_)
+        version.delete(note_id)
         return JsonResponse({
             'status_code': 500,
             'error': 'note updation error',
