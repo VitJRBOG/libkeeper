@@ -84,17 +84,17 @@ def update(request: HttpRequest) -> JsonResponse:
     id_ = request.POST.get('id')
     if id_ is None:
         return JsonResponse({
-                'status_code': 400,
-                'error': '"id" attribute is required',
-            })
+            'status_code': 400,
+            'error': '"id" attribute is required',
+        })
 
     try:
         note = models.Note.objects.get(id=id_)
     except models.Note.DoesNotExist:
         return JsonResponse({
-                'status_code': 404,
-                'error': 'no objects with the specified ID were found',
-            })
+            'status_code': 404,
+            'error': 'no objects with the specified ID were found',
+        })
 
     text = request.POST.get('text')
     if text is None or text == '' or text == ' ':
@@ -184,7 +184,8 @@ def get_by_id(request: HttpRequest) -> JsonResponse:
 
     try:
         if id_ is not None:
-            queryset = models.Version.objects.filter(note_id=id_).order_by('date').reverse().values()
+            queryset = models.Version.objects.filter(
+                note_id=id_).order_by('date').reverse().values()
 
             return JsonResponse({
                 'status_code': 200,
@@ -219,7 +220,7 @@ def __compose_title(text: str) -> tuple[str, str]:
 def __get_date() -> tuple[str, int]:
     try:
         today = datetime.datetime.now()
-        
+
         return ('', int(time.mktime(today.timetuple())))
     except Exception as e:
         logging.Logger('critical').critical(e, exc_info=True)
