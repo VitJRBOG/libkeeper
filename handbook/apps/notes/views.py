@@ -42,7 +42,7 @@ def add(request: HttpRequest) -> JsonResponse:
         note = models.Note()
         note.create(title, date)
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         return JsonResponse({
             'status_code': 500,
             'error': 'note creation error',
@@ -62,7 +62,7 @@ def add(request: HttpRequest) -> JsonResponse:
         version = models.Version()
         version.create(text, date, checksum, note_id)
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         note.delete(note_id)
         return JsonResponse({
             'status_code': 500,
@@ -128,7 +128,7 @@ def update(request: HttpRequest) -> JsonResponse:
         version = models.Version()
         version.create(text, date, checksum, id_)  # type: ignore
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         return JsonResponse({
             'status_code': 500,
             'error': 'note updation error',
@@ -138,7 +138,7 @@ def update(request: HttpRequest) -> JsonResponse:
         note.title = title
         note.save()
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         version.delete(id_)
         return JsonResponse({
             'status_code': 500,
@@ -166,7 +166,7 @@ def get_all(request: HttpRequest) -> JsonResponse:
             'items': list(queryset),
         })
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         return JsonResponse({
             'status_code': 500,
             'error': 'note selection error',
@@ -196,7 +196,7 @@ def get_by_id(request: HttpRequest) -> JsonResponse:
                 'error': '"id" attribute is required',
             })
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         return JsonResponse({
             'status_code': 500,
             'error': 'note selection error',
@@ -212,7 +212,7 @@ def __compose_title(text: str) -> tuple[str, str]:
             return ('', f'{text[:46]}...')
         return ('', text)
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         return ('error of title composing', '')
 
 def __get_date() -> tuple[str, int]:
@@ -221,7 +221,7 @@ def __get_date() -> tuple[str, int]:
         
         return ('', int(time.mktime(today.timetuple())))
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         return ('error of getting date', 0)
 
 def __gen_checksum(text: str) -> tuple[str, str]:
@@ -229,5 +229,5 @@ def __gen_checksum(text: str) -> tuple[str, str]:
         hash = hashlib.md5(text.encode('utf-8'))
         return ('', hash.hexdigest())
     except Exception as e:
-        logging.Logger('critical').critical(e)
+        logging.Logger('critical').critical(e, exc_info=True)
         return ('error of checksum generation', '')
