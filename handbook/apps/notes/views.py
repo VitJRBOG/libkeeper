@@ -48,7 +48,17 @@ def add(request: HttpRequest) -> JsonResponse:
             'error': 'note creation error',
         })
 
-    note_id = models.Note.objects.last().id  # type: ignore
+    last_note_object = models.Note.objects.last()
+    note_id: int
+    if last_note_object is not None:
+        note_id = last_note_object.id
+    else:
+        e = 'last_note_object is None'
+        logging.Logger('critical').critical(e, exc_info=True)
+        return JsonResponse({
+            'status_code': 500,
+            'error': 'note creation error',
+        })
 
     err, checksum = __gen_checksum(text)
 
@@ -69,7 +79,17 @@ def add(request: HttpRequest) -> JsonResponse:
             'error': 'note creation error',
         })
 
-    version_id = models.Version.objects.last().id  # type: ignore
+    last_version_object = models.Version.objects.last()
+    version_id: int
+    if last_version_object is not None:
+        version_id = last_version_object.id
+    else:
+        e = 'last_version_object is None'
+        logging.Logger('critical').critical(e, exc_info=True)
+        return JsonResponse({
+            'status_code': 500,
+            'error': 'note creation error',
+        })
 
     return JsonResponse({
         'status_code': 200,
@@ -147,7 +167,7 @@ def update(request: HttpRequest) -> JsonResponse:
 
     try:
         version = models.Version()
-        version.create(text, date, checksum, note_id)  # type: ignore
+        version.create(text, date, checksum, note_id)
     except Exception as e:
         logging.Logger('critical').critical(e, exc_info=True)
         return JsonResponse({
@@ -155,7 +175,17 @@ def update(request: HttpRequest) -> JsonResponse:
             'error': 'note updation error',
         })
 
-    version_id = models.Version.objects.last().id  # type: ignore
+    last_version_object = models.Version.objects.last()
+    version_id: int
+    if last_version_object is not None:
+        version_id = last_version_object.id
+    else:
+        e = 'last_version_object is None'
+        logging.Logger('critical').critical(e, exc_info=True)
+        return JsonResponse({
+            'status_code': 500,
+            'error': 'note updation error',
+        })
 
     try:
         note.title = title
