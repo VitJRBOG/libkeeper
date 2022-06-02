@@ -213,7 +213,7 @@ def update(request: HttpRequest) -> JsonResponse:
     })
 
 
-def get_all(request: HttpRequest) -> JsonResponse:
+def get_notes(request: HttpRequest) -> JsonResponse:
     if request.method != 'GET':
         return JsonResponse({
             'status_code': 400,
