@@ -236,7 +236,7 @@ def get_all(request: HttpRequest) -> JsonResponse:
         })
 
 
-def get_by_id(request: HttpRequest) -> JsonResponse:
+def get_versions(request: HttpRequest) -> JsonResponse:
     if request.method != 'GET':
         return JsonResponse({
             'status_code': 400,
@@ -266,7 +266,8 @@ def get_by_id(request: HttpRequest) -> JsonResponse:
 
         return JsonResponse({
             'status_code': 200,
-            'items': list(queryset)[0],
+            'count': queryset.count(),
+            'items': list(queryset),
         })
     except Exception as e:
         logging.Logger('critical').critical(e, exc_info=True)
