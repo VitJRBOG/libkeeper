@@ -6,17 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notes', '0001_initial'),
+        ('api', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='Version',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(primary_key=True,
+                 serialize=False, verbose_name='ID')),
                 ('text', models.TextField(max_length=1000, verbose_name='Text')),
                 ('date', models.IntegerField(verbose_name='Creation date')),
-                ('checksum', models.CharField(max_length=64, verbose_name='Checksum')),
+                ('checksum', models.CharField(
+                    max_length=64, verbose_name='Checksum')),
                 ('note_id', models.IntegerField(verbose_name='Note ID')),
             ],
             options={

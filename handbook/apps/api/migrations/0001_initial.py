@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Note',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(primary_key=True,
+                 serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=50, verbose_name='Title')),
                 ('date', models.IntegerField(verbose_name='Creation date')),
             ],
