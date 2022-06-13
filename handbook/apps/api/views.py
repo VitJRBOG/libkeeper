@@ -106,14 +106,14 @@ def add_note(request: HttpRequest) -> JsonResponse:
     })
 
 
-def update_note(request: HttpRequest) -> JsonResponse:
+def add_version(request: HttpRequest) -> JsonResponse:
     if request.method != 'POST':
         return JsonResponse({
             'status_code': 400,
             'error': f'{request.method} is not allowed.',
         })
 
-    id_ = request.POST.get('id')
+    id_ = request.POST.get('note_id')
     if id_ is None:
         return JsonResponse({
             'status_code': 400,
