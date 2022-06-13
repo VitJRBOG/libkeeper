@@ -7,7 +7,7 @@ from django.http import HttpRequest, JsonResponse
 from . import models
 
 
-def add(request: HttpRequest) -> JsonResponse:
+def add_note(request: HttpRequest) -> JsonResponse:
     if request.method != 'POST':
         return JsonResponse({
             'status_code': 400,
@@ -106,7 +106,7 @@ def add(request: HttpRequest) -> JsonResponse:
     })
 
 
-def update(request: HttpRequest) -> JsonResponse:
+def update_note(request: HttpRequest) -> JsonResponse:
     if request.method != 'POST':
         return JsonResponse({
             'status_code': 400,
