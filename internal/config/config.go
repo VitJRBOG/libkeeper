@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// DBConnection store a DB connection params.
+// DBConnectionConfig store a DB connection params.
 type DBConnectionConfig struct {
 	dbms             string
 	host             string
@@ -13,6 +13,7 @@ type DBConnectionConfig struct {
 	dbmsUserName     string
 	dbmsUserPassword string
 	dbName           string
+	sslMode          string
 }
 
 // NewDBConnectionConfig parse the environment variables and return a DBConnectionConfig struct.
@@ -23,6 +24,7 @@ func NewDBConnectionConfig() DBConnectionConfig {
 	dbmsUserName := os.Getenv("DBMS_USER_NAME")
 	dbmsUserPassword := os.Getenv("DMBS_USER_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
+	sslMode := os.Getenv("SSL_MODE")
 
 	someIsEmpty := false
 
@@ -50,6 +52,10 @@ func NewDBConnectionConfig() DBConnectionConfig {
 		log.Println("DB_NAME env is empty")
 		someIsEmpty = true
 	}
+	if sslMode == "" {
+		log.Println("SSL_MODE env is empty")
+		someIsEmpty = true
+	}
 
 	if someIsEmpty {
 		log.Fatalln("some desktop environments is empty")
@@ -62,6 +68,7 @@ func NewDBConnectionConfig() DBConnectionConfig {
 		dbmsUserName:     dbmsUserName,
 		dbmsUserPassword: dbmsUserPassword,
 		dbName:           dbName,
+		sslMode:          sslMode,
 	}
 }
 
@@ -93,6 +100,11 @@ func (c *DBConnectionConfig) DBMSUserPassword() string {
 // DBName return the dbName field of DBConnectionConfig.
 func (c *DBConnectionConfig) DBName() string {
 	return c.dbName
+}
+
+// SSLMode return the sslMode field of DBConnectionConfig.
+func (c *DBConnectionConfig) SSLMode() string {
+	return c.sslMode
 }
 
 // ServerConfig store a server params.

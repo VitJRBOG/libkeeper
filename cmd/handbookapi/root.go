@@ -14,10 +14,11 @@ func Execute() {
 
 	dbConnCfg := config.NewDBConnectionConfig()
 
-	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s",
+	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=%s",
 		dbConnCfg.DBMS(),
 		dbConnCfg.DBMSUserName(), dbConnCfg.DBMSUserPassword(),
-		dbConnCfg.Host(), dbConnCfg.Port(), dbConnCfg.DBName())
+		dbConnCfg.Host(), dbConnCfg.Port(), dbConnCfg.DBName(),
+		dbConnCfg.SSLMode())
 
 	dbConn := db.NewConnection(dsn)
 
