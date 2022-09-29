@@ -94,3 +94,26 @@ func (c *DBConnectionConfig) DBMSUserPassword() string {
 func (c *DBConnectionConfig) DBName() string {
 	return c.dbName
 }
+
+// ServerConfig store a server params.
+type ServerConfig struct {
+	port string
+}
+
+// NewServerConfig parse the environment variables and return a ServerConfig struct.
+func NewServerConfig() ServerConfig {
+	port := os.Getenv("SERVER_PORT")
+
+	if port == "" {
+		log.Fatalln("SERVER_PORT env variable is empty")
+	}
+
+	return ServerConfig{
+		port: port,
+	}
+}
+
+// Port return the port field of ServerConfig.
+func (c *ServerConfig) Port() string {
+	return c.port
+}
