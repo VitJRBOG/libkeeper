@@ -5,10 +5,13 @@ import (
 	"handbook-api/internal/config"
 	"handbook-api/internal/db"
 	"handbook-api/internal/server"
+	"log"
 )
 
 // Execute starts the main functions of program.
 func Execute() {
+	initializeLogger()
+
 	dbConnCfg := config.NewDBConnectionConfig()
 
 	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s",
@@ -21,4 +24,8 @@ func Execute() {
 	serverCfg := config.NewServerConfig()
 
 	server.Up(dbConn, serverCfg)
+}
+
+func initializeLogger() {
+	log.SetFlags(log.Ldate | log.Llongfile)
 }
