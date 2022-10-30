@@ -24,12 +24,14 @@ func SelectNotes(dbConn *sql.DB, id int) ([]models.Note, error) {
 	notes := []models.Note{}
 
 	query := "SELECT * FROM notes"
+	params := []any{}
 
 	if id != -1 {
 		query += " WHERE id = $1"
+		params = append(params, id)
 	}
 
-	rows, err := dbConn.Query(query, id)
+	rows, err := dbConn.Query(query, params...)
 	if err != nil {
 		log.Printf("%s: %s", err.Error(), query)
 		return nil, err
