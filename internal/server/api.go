@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"handbook-api/internal/db"
 	"handbook-api/internal/models"
 	"net/http"
@@ -74,4 +75,68 @@ func getNotes(dbConn *sql.DB, params url.Values) ([]models.Note, error) {
 	}
 
 	return notes, nil
+}
+
+func updateNote(dbConn *sql.DB, params url.Values) (int, error) {
+	var err error
+	noteID := -1
+
+	if params.Has("id") {
+		noteID, err = strconv.Atoi(params.Get("id"))
+		if err != nil {
+			return -1, Error{http.StatusBadRequest, "'id' param must be integer"}
+		}
+	} else {
+		return -1, Error{http.StatusBadRequest, "'id' param is empty"}
+	}
+
+	if !params.Has("title") {
+		return -1, Error{http.StatusBadRequest, "'title' param is empty"}
+	}
+
+	if !params.Has("text") {
+		return -1, Error{http.StatusBadRequest, "'text' param is empty"}
+	}
+
+	if !params.Has("date") {
+		return -1, Error{http.StatusBadRequest, "'date' param is empty"}
+	}
+
+	if !params.Has("checksum") {
+		return -1, Error{http.StatusBadRequest, "'checksum' param is empty"}
+	}
+
+	date, err := time.Parse("2006-01-02 15:04:05", params.Get("date"))
+	if err != nil {
+		return -1, Error{http.StatusBadRequest, "'date' has the invalid format"}
+	}
+
+	note := models.Note{
+		ID:    noteID,
+		Title: params.Get("title"),
+	}
+
+	changesNumber, err := db.UpdateNote(dbConn, note)
+	if err != nil {
+		return -1, Error{http.StatusServiceUnavailable, "couldn't update note"}
+	}
+
+	if changesNumber == 0 {
+		return -1, Error{http.StatusBadRequest, fmt.Sprintf(
+			"no rows with id = %d were found", noteID)}
+	}
+
+	version := models.Version{
+		Text:     params.Get("text"),
+		Date:     date.Unix(),
+		Checksum: params.Get("checksum"),
+		NoteID:   noteID,
+	}
+
+	versionID, err := db.InsertVersion(dbConn, version)
+	if err != nil {
+		return -1, Error{http.StatusServiceUnavailable, "couldn't create version"}
+	}
+
+	return versionID, nil
 }

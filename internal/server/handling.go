@@ -62,8 +62,22 @@ func handler(dbConn *sql.DB) {
 
 			sendData(w, http.StatusOK, notes)
 		case http.MethodPut:
-			log.Println("update note")
-			// TODO: describe a PUT method handler for /notes
+			err := r.ParseForm()
+			if err != nil {
+				log.Println(err.Error())
+				sendError(w, err)
+				return
+			}
+
+			versionID, err := updateNote(dbConn, r.Form)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusCreated, []map[string]int{{
+				"version_id": versionID,
+			}})
 		case http.MethodDelete:
 			log.Println("delete note")
 			// TODO: describe a DELETE method handler for /notes

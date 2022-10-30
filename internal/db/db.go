@@ -73,6 +73,26 @@ func SelectNotes(dbConn *sql.DB, id int) ([]models.Note, error) {
 	return notes, nil
 }
 
+// UpdateNote updates exists row of table 'notes' by ID and set new value to 'title' field,
+// then returns number of changed rows.
+func UpdateNote(dbConn *sql.DB, note models.Note) (int64, error) {
+	query := "UPDATE notes SET title = $1 WHERE id = $2"
+
+	result, err := dbConn.Exec(query, note.Title, note.ID)
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	return count, nil
+}
+
 // InsertVersion inserts new row to 'versions' table and return ID of this new.
 func InsertVersion(dbConn *sql.DB, version models.Version) (int, error) {
 	query := "INSERT INTO versions(text, c_date, ch_sum, note_id) VALUES($1, $2, $3, $4) " +
