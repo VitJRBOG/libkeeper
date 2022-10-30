@@ -93,6 +93,25 @@ func UpdateNote(dbConn *sql.DB, note models.Note) (int64, error) {
 	return count, nil
 }
 
+// DeleteNote deletes exists row from 'notes' table by ID and returns number of deleted rows.
+func DeleteNote(dbConn *sql.DB, note models.Note) (int64, error) {
+	query := "DELETE FROM notes WHERE id = $1"
+
+	result, err := dbConn.Exec(query, note.ID)
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	return count, nil
+}
+
 // InsertVersion inserts new row to 'versions' table and return ID of this new.
 func InsertVersion(dbConn *sql.DB, version models.Version) (int, error) {
 	query := "INSERT INTO versions(text, c_date, ch_sum, note_id) VALUES($1, $2, $3, $4) " +
@@ -108,4 +127,24 @@ func InsertVersion(dbConn *sql.DB, version models.Version) (int, error) {
 	}
 
 	return id, nil
+}
+
+// DeleteVersionsByNoteID deletes exists row from 'notes' table by ID
+// and returns number of deleted rows.
+func DeleteVersionsByNoteID(dbConn *sql.DB, version models.Version) (int64, error) {
+	query := "DELETE FROM versions WHERE note_id = $1"
+
+	result, err := dbConn.Exec(query, version.NoteID)
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	return count, nil
 }

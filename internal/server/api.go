@@ -140,3 +140,44 @@ func updateNote(dbConn *sql.DB, params url.Values) (int, error) {
 
 	return versionID, nil
 }
+
+func deleteNote(dbConn *sql.DB, params url.Values) error {
+	var err error
+	noteID := -1
+
+	if params.Has("id") {
+		noteID, err = strconv.Atoi(params.Get("id"))
+		if err != nil {
+			return Error{http.StatusBadRequest, "'id' param must be integer"}
+		}
+	} else {
+		return Error{http.StatusBadRequest, "'id' param is empty"}
+	}
+
+	version := models.Version{
+		NoteID: noteID,
+	}
+
+	changesNumber, err := db.DeleteVersionsByNoteID(dbConn, version)
+
+	if changesNumber == 0 {
+		return Error{http.StatusBadRequest,
+			fmt.Sprintf("no rows with note_id = %d were found", noteID)}
+	}
+
+	note := models.Note{
+		ID: noteID,
+	}
+
+	changesNumber, err = db.DeleteNote(dbConn, note)
+	if err != nil {
+		return Error{http.StatusServiceUnavailable, "couldn't update note"}
+	}
+
+	if changesNumber == 0 {
+		return Error{http.StatusBadRequest,
+			fmt.Sprintf("no rows with id = %d were found", noteID)}
+	}
+
+	return nil
+}
