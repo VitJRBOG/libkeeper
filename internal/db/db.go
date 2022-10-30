@@ -75,11 +75,13 @@ func SelectNotes(dbConn *sql.DB, id int) ([]models.Note, error) {
 
 // InsertVersion inserts new row to 'versions' table and return ID of this new.
 func InsertVersion(dbConn *sql.DB, version models.Version) (int, error) {
-	query := "INSERT INTO versions(text, c_date, note_id) VALUES($1, $2, $3) RETURNING id"
+	query := "INSERT INTO versions(text, c_date, ch_sum, note_id) VALUES($1, $2, $3, $4) " +
+		"RETURNING id"
 
 	id := -1
 
-	err := dbConn.QueryRow(query, version.Text, version.Date, version.NoteID).Scan(&id)
+	err := dbConn.QueryRow(query, version.Text, version.Date,
+		version.Checksum, version.NoteID).Scan(&id)
 	if err != nil {
 		log.Printf("%s: %s", err.Error(), query)
 		return -1, err
