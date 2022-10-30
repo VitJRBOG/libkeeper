@@ -28,8 +28,24 @@ func handler(dbConn *sql.DB) {
 	http.HandleFunc("/notes", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			log.Println("create note")
-			// TODO: describe a POST method handler for /notes
+			err := r.ParseForm()
+			if err != nil {
+				log.Println(err.Error())
+				sendError(w, err)
+				return
+			}
+
+			noteID, versionID, err := createNote(dbConn, r.Form)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusCreated, []map[string]int{{
+				"note_id":    noteID,
+				"version_id": versionID,
+			}})
+
 		case http.MethodGet:
 			err := r.ParseForm()
 			if err != nil {
@@ -82,7 +98,7 @@ func sendData(w http.ResponseWriter, status int, values interface{}) {
 
 func sendError(w http.ResponseWriter, reqError error) {
 	response := map[string]interface{}{
-			"status": http.StatusInternalServerError,
+		"status": http.StatusInternalServerError,
 		"error":  "internal server error",
 	}
 

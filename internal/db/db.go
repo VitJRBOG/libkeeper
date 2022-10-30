@@ -18,6 +18,21 @@ func NewConnection(dsn string) *sql.DB {
 	return dbConn
 }
 
+// InsertNote inserts new row to 'notes' table and return ID of this new.
+func InsertNote(dbConn *sql.DB, note models.Note) (int, error) {
+	query := "INSERT INTO notes(title, c_date) VALUES($1, $2) RETURNING id"
+
+	id := -1
+
+	err := dbConn.QueryRow(query, note.Title, note.Date).Scan(&id)
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	return id, nil
+}
+
 // SelectNotes selects field from 'notes' table by 'id', if id != -1.
 // Else selects all fields from 'notes'.
 func SelectNotes(dbConn *sql.DB, id int) ([]models.Note, error) {
@@ -56,4 +71,19 @@ func SelectNotes(dbConn *sql.DB, id int) ([]models.Note, error) {
 	}
 
 	return notes, nil
+}
+
+// InsertVersion inserts new row to 'versions' table and return ID of this new.
+func InsertVersion(dbConn *sql.DB, version models.Version) (int, error) {
+	query := "INSERT INTO versions(text, c_date, note_id) VALUES($1, $2, $3) RETURNING id"
+
+	id := -1
+
+	err := dbConn.QueryRow(query, version.Text, version.Date, version.NoteID).Scan(&id)
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	return id, nil
 }
