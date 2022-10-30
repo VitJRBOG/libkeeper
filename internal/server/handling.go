@@ -22,7 +22,7 @@ func (e Error) Error() string {
 // handler handles received requests.
 func handler(dbConn *sql.DB) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		sendData(w, map[string]map[string]string{"response": {"msg": "Hello world"}})
+		sendData(w, http.StatusOK, "Hello world")
 	})
 
 	http.HandleFunc("/notes", func(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +44,7 @@ func handler(dbConn *sql.DB) {
 				return
 			}
 
-			sendData(w, notes)
+			sendData(w, http.StatusOK, notes)
 		case http.MethodPut:
 			log.Println("update note")
 			// TODO: describe a PUT method handler for /notes
@@ -58,8 +58,13 @@ func handler(dbConn *sql.DB) {
 	})
 }
 
-func sendData(w http.ResponseWriter, values interface{}) {
-	data, err := json.Marshal(values)
+func sendData(w http.ResponseWriter, status int, values interface{}) {
+	response := map[string]interface{}{
+		"status":   status,
+		"response": values,
+	}
+
+	data, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err.Error())
 		sendError(w, err)
@@ -75,22 +80,18 @@ func sendData(w http.ResponseWriter, values interface{}) {
 	}
 }
 
-func sendError(w http.ResponseWriter, err error) {
-	values := map[string]map[string]any{
-		"error": {
+func sendError(w http.ResponseWriter, reqError error) {
+	response := map[string]interface{}{
 			"status": http.StatusInternalServerError,
-			"detail": "",
-		},
+		"error":  "internal server error",
 	}
 
-	if errInfo, ok := err.(Error); ok {
-		values["error"]["status"] = errInfo.HTTPStatus
-		values["error"]["detail"] = errInfo.Detail
-	} else {
-		values["error"]["detail"] = "internal server error"
+	if errInfo, ok := reqError.(Error); ok {
+		response["status"] = errInfo.HTTPStatus
+		response["error"] = errInfo.Detail
 	}
 
-	data, err := json.Marshal(values)
+	data, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err.Error())
 		return
