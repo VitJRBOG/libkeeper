@@ -184,7 +184,7 @@ func DeleteVersionByID(dbConn *sql.DB, id int) (int64, error) {
 	return count, nil
 }
 
-// DeleteVersionsByNoteID deletes exists row from 'notes' table by ID
+// DeleteVersionsByNoteID deletes exists row from 'versions' table by 'note_id'
 // and returns number of deleted rows.
 func DeleteVersionsByNoteID(dbConn *sql.DB, version models.Version) (int64, error) {
 	query := "DELETE FROM versions WHERE note_id = $1"
