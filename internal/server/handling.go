@@ -93,7 +93,29 @@ func handler(dbConn *sql.DB) {
 			}
 
 			sendData(w, http.StatusNoContent, []struct{}{})
+		default:
+			sendError(w, Error{http.StatusMethodNotAllowed, "method not allowed"})
+			return
+		}
+	})
 
+	http.HandleFunc("/versions", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			err := r.ParseForm()
+			if err != nil {
+				log.Println(err.Error())
+				sendError(w, err)
+				return
+			}
+
+			versions, err := getVersions(dbConn, r.Form)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusOK, versions)
 		default:
 			sendError(w, Error{http.StatusMethodNotAllowed, "method not allowed"})
 			return

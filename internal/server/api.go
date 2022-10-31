@@ -181,3 +181,24 @@ func deleteNote(dbConn *sql.DB, params url.Values) error {
 
 	return nil
 }
+
+func getVersions(dbConn *sql.DB, params url.Values) ([]models.Version, error) {
+	var err error
+	noteID := -1
+
+	if params.Has("note_id") {
+		noteID, err = strconv.Atoi(params.Get("note_id"))
+		if err != nil {
+			return nil, Error{http.StatusBadRequest, "'note_id' param must be integer"}
+		}
+	} else {
+		return nil, Error{http.StatusBadRequest, "'note_id' param is empty"}
+	}
+
+	versions, err := db.SelectVersionsByNoteID(dbConn, noteID)
+	if err != nil {
+		return nil, Error{http.StatusServiceUnavailable, "couldn't get versions"}
+	}
+
+	return versions, nil
+}

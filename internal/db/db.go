@@ -129,6 +129,41 @@ func InsertVersion(dbConn *sql.DB, version models.Version) (int, error) {
 	return id, nil
 }
 
+// SelectVersionsByNoteID selects field from 'versions' table by 'note_id'.
+func SelectVersionsByNoteID(dbConn *sql.DB, noteID int) ([]models.Version, error) {
+	versions := []models.Version{}
+
+	query := "SELECT * FROM versions WHERE note_id = $1"
+
+	rows, err := dbConn.Query(query, noteID)
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return nil, err
+	}
+
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			log.Printf(err.Error())
+		}
+	}()
+
+	for rows.Next() {
+		version := models.Version{}
+
+		if err := rows.Scan(&version.ID, &version.Text, &version.Date,
+			&version.Checksum, &version.NoteID); err != nil {
+
+			log.Printf(err.Error())
+			return nil, err
+		}
+
+		versions = append(versions, version)
+	}
+
+	return versions, nil
+}
+
 // DeleteVersionsByNoteID deletes exists row from 'notes' table by ID
 // and returns number of deleted rows.
 func DeleteVersionsByNoteID(dbConn *sql.DB, version models.Version) (int64, error) {
