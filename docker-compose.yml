@@ -1,0 +1,38 @@
+services:
+  psql:
+    build:
+      context: ./
+      dockerfile: ./docker/psql/Dockerfile
+    container_name: handbook_psql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwe
+      - POSTGRES_DB=handbook
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ./
+      dockerfile: ./docker/app/Dockerfile
+    container_name: handbook_api
+    ports:
+      - 8000:8000
+    environment:
+      - DBMS=postgres
+      - DBMS_HOST=host.docker.internal
+      - DBMS_PORT=5432
+      - DBMS_USER_NAME=postgres
+      - DMBS_USER_PASSWORD=qwe
+      - DB_NAME=handbook
+      - SSL_MODE=disable
+      - SERVER_PORT=8000
+    depends_on:
+      psql:
+        condition: service_healthy
+    command: bash -c "go mod download && go build -o app && ./app"
