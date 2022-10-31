@@ -164,6 +164,26 @@ func SelectVersionsByNoteID(dbConn *sql.DB, noteID int) ([]models.Version, error
 	return versions, nil
 }
 
+// DeleteVersionByID deletes exists row from 'versions' table by ID
+// and returns number of deleted rows.
+func DeleteVersionByID(dbConn *sql.DB, id int) (int64, error) {
+	query := "DELETE FROM versions WHERE id = $1"
+
+	result, err := dbConn.Exec(query, id)
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("%s: %s", err.Error(), query)
+		return -1, err
+	}
+
+	return count, nil
+}
+
 // DeleteVersionsByNoteID deletes exists row from 'notes' table by ID
 // and returns number of deleted rows.
 func DeleteVersionsByNoteID(dbConn *sql.DB, version models.Version) (int64, error) {

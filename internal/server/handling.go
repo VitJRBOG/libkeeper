@@ -116,6 +116,21 @@ func handler(dbConn *sql.DB) {
 			}
 
 			sendData(w, http.StatusOK, versions)
+		case http.MethodDelete:
+			err := r.ParseForm()
+			if err != nil {
+				log.Println(err.Error())
+				sendError(w, err)
+				return
+			}
+
+			err = deleteVersion(dbConn, r.Form)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusNoContent, []struct{}{})
 		default:
 			sendError(w, Error{http.StatusMethodNotAllowed, "method not allowed"})
 			return
