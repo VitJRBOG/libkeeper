@@ -1,7 +1,7 @@
 package main
 
-import "handbook-api/cmd/handbookapi"
+import "libkeeper-api/cmd/libkeeperapi"
 
 func main() {
-	handbookapi.Execute()
+	libkeeperapi.Execute()
 }

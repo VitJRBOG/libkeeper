@@ -4,6 +4,9 @@
 # VSCode files
 .vscode/
 
+# Binaries
+bin/
+
 # Other
 junk/
 log.log

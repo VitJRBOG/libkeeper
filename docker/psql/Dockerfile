@@ -1,2 +1,2 @@
-FROM postgres:bullseye
-COPY docker/psql/inittables.sql /docker-entrypoint-initdb.d/
+FROM postgres:15
+COPY docker/psql/migrate.sql /docker-entrypoint-initdb.d/
