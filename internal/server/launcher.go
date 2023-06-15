@@ -3,12 +3,13 @@ package server
 import (
 	"fmt"
 	"libkeeper-api/internal/config"
+	"libkeeper-api/internal/db"
 	"log"
 	"net/http"
 )
 
 // Up starts the server.
-func Up(serverCfg config.ServerCfg) {
+func Up(serverCfg config.ServerCfg, dbConn db.Connection) {
 	handling()
 	log.Println("request handling is ready")
 
