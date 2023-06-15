@@ -10,7 +10,7 @@ import (
 
 // Up starts the server.
 func Up(serverCfg config.ServerCfg, dbConn db.Connection) {
-	handling()
+	handling(dbConn)
 	log.Println("request handling is ready")
 
 	address := fmt.Sprintf(":%s", serverCfg.Port)
