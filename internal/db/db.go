@@ -69,3 +69,17 @@ func SelectNotes(dbConn Connection) ([]models.Note, error) {
 
 	return notes, nil
 }
+
+// UpdateNote updates an existing entry in the 'note' table and inserts a new entry in the 'version' table.
+func UpdateNote(dbConn Connection, note models.Note, version models.Version) error {
+	query := "WITH updated_note AS (UPDATE note SET title=$1 WHERE id=$2 RETURNING id) " +
+		"INSERT INTO version(full_text, c_date, checksum, note_id) " +
+		"VALUES($3, $4, $5, (SELECT id FROM updated_note))"
+
+	_, err := dbConn.Conn.Exec(query, note.Title, note.ID, version.FullText, version.CreationDate, version.Checksum)
+	if err != nil {
+		return fmt.Errorf("failed to update the 'note' table entry and insert a new 'version' table entry: %s", err)
+	}
+
+	return nil
+}

@@ -44,6 +44,18 @@ func handling(dbConn db.Connection) {
 				sendError(w, err)
 				return
 			}
+		case http.MethodPut:
+			err := parseRequestParams(r)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			err = updateNote(dbConn, r)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
 		default:
 			sendError(w, Error{http.StatusMethodNotAllowed, "method not allowed"})
 			return
@@ -200,4 +212,80 @@ func getNotes(dbConn db.Connection) ([]models.Note, error) {
 	}
 
 	return notes, nil
+}
+
+func updateNote(dbConn db.Connection, r *http.Request) error {
+	emptyParam := []string{}
+	someIsEmpty := false
+
+	if r.PostFormValue("note_id") == "" {
+		someIsEmpty = true
+		emptyParam = append(emptyParam, "note_id")
+	}
+
+	if r.PostFormValue("c_date") == "" {
+		someIsEmpty = true
+		emptyParam = append(emptyParam, "c_date")
+	}
+
+	if r.PostFormValue("checksum") == "" {
+		someIsEmpty = true
+		emptyParam = append(emptyParam, "checksum")
+	}
+
+	if someIsEmpty {
+		errMsg := "some request parameters are missing: "
+
+		for i := range emptyParam {
+			if i > 0 && i < len(emptyParam) {
+				errMsg += ", "
+			}
+			errMsg += fmt.Sprintf("'%s'", emptyParam[i])
+		}
+
+		return Error{
+			http.StatusBadRequest,
+			errMsg,
+		}
+	}
+
+	noteID, err := strconv.Atoi(r.PostFormValue("note_id"))
+	if err != nil {
+		return Error{
+			http.StatusBadRequest,
+			"the 'note_id' parameter must be an integer",
+		}
+	}
+
+	creationDate, err := time.Parse("2006-01-02 15:04:05 -0700", r.PostFormValue("c_date"))
+	if err != nil {
+		return Error{
+			http.StatusBadRequest,
+			"the 'c_date' parameter must be in the format 'yyyy-mm-dd hh:mm:ss -0000'",
+		}
+	}
+	cDate := strconv.FormatInt(creationDate.Unix(), 10)
+
+	note := models.Note{
+		ID:    noteID,
+		Title: r.PostFormValue("title"),
+	}
+
+	version := models.Version{
+		FullText:     r.PostFormValue("full_text"),
+		CreationDate: cDate,
+		Checksum:     r.PostFormValue("checksum"),
+		NoteID:       noteID,
+	}
+
+	err = db.UpdateNote(dbConn, note, version)
+	if err != nil {
+		log.Printf("failed to update a note: %s", err)
+		return Error{
+			http.StatusInternalServerError,
+			"failed to update a note",
+		}
+	}
+
+	return nil
 }
