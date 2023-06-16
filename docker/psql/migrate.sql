@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS note;
 
 CREATE TABLE note (
     id SERIAL NOT NULL UNIQUE,
+    title TEXT,
     c_date TEXT NOT NULL,
     PRIMARY KEY(id)
 );
