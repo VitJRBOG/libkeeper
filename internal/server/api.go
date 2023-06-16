@@ -120,11 +120,6 @@ func createNote(dbConn db.Connection, r *http.Request) error {
 		emptyParam = append(emptyParam, "c_date")
 	}
 
-	if r.PostFormValue("full_text") == "" {
-		someIsEmpty = true
-		emptyParam = append(emptyParam, "full_text")
-	}
-
 	if r.PostFormValue("checksum") == "" {
 		someIsEmpty = true
 		emptyParam = append(emptyParam, "checksum")
@@ -156,6 +151,7 @@ func createNote(dbConn db.Connection, r *http.Request) error {
 	cDate := strconv.FormatInt(creationDate.Unix(), 10)
 
 	note := models.Note{
+		Title:        r.PostFormValue("title"),
 		CreationDate: cDate,
 	}
 
