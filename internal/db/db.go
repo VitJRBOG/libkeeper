@@ -44,3 +44,28 @@ func CreateNote(dbConn Connection, note models.Note, version models.Version) err
 
 	return nil
 }
+
+// SelectNotes selects entries from the "note" table.
+func SelectNotes(dbConn Connection) ([]models.Note, error) {
+	query := "SELECT * FROM note"
+
+	rows, err := dbConn.Conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select entries from the 'note' table: %s", err)
+	}
+
+	notes := []models.Note{}
+
+	for rows.Next() {
+		note := models.Note{}
+
+		err := rows.Scan(&note.ID, &note.Title, &note.CreationDate)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan rows from the 'note' table: %s", err)
+		}
+
+		notes = append(notes, note)
+	}
+
+	return notes, nil
+}

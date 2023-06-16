@@ -49,6 +49,22 @@ func handling(dbConn db.Connection) {
 			return
 		}
 	})
+
+	http.HandleFunc("/notes", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			notes, err := getNotes(dbConn)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusOK, notes)
+		default:
+			sendError(w, Error{http.StatusMethodNotAllowed, "method not allowed"})
+			return
+		}
+	})
 }
 
 func sendData(w http.ResponseWriter, status int, values interface{}) {
@@ -171,4 +187,17 @@ func createNote(dbConn db.Connection, r *http.Request) error {
 	}
 
 	return nil
+}
+
+func getNotes(dbConn db.Connection) ([]models.Note, error) {
+	notes, err := db.SelectNotes(dbConn)
+	if err != nil {
+		log.Printf("unable fetch notes from the database: %s", err)
+		return nil, Error{
+			http.StatusInternalServerError,
+			"unable fetch notes from the database",
+		}
+	}
+
+	return notes, nil
 }
