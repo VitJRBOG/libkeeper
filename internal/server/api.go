@@ -32,6 +32,20 @@ func handling(dbConn db.Connection) {
 
 	http.HandleFunc("/note", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
+		case http.MethodGet:
+			err := parseRequestParams(r)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			versions, err := getVersions(dbConn, r)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusOK, versions)
 		case http.MethodPost:
 			err := parseRequestParams(r)
 			if err != nil {
@@ -212,6 +226,34 @@ func getNotes(dbConn db.Connection) ([]models.Note, error) {
 	}
 
 	return notes, nil
+}
+
+func getVersions(dbConn db.Connection, r *http.Request) ([]models.Version, error) {
+	if r.FormValue("note_id") == "" {
+		return nil, Error{
+			http.StatusBadRequest,
+			"the 'note_id' parameter is empty",
+		}
+	}
+
+	noteID, err := strconv.Atoi(r.FormValue("note_id"))
+	if err != nil {
+		return nil, Error{
+			http.StatusBadRequest,
+			"the 'note_id' parameter must be an integer",
+		}
+	}
+
+	versions, err := db.SelectVersions(dbConn, noteID)
+	if err != nil {
+		log.Printf("unable to fetch note versions from the database: %s", err)
+		return nil, Error{
+			http.StatusInternalServerError,
+			"unable to fetch note versions from the database",
+		}
+	}
+
+	return versions, nil
 }
 
 func updateNote(dbConn db.Connection, r *http.Request) error {

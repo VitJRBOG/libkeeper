@@ -70,6 +70,31 @@ func SelectNotes(dbConn Connection) ([]models.Note, error) {
 	return notes, nil
 }
 
+// SelectVersions selects entries from the "version" table by the value of "note_id" field. Returns them sorted by DESC.
+func SelectVersions(dbConn Connection, noteID int) ([]models.Version, error) {
+	query := "SELECT * FROM version WHERE note_id = $1 ORDER BY c_date DESC"
+
+	rows, err := dbConn.Conn.Query(query, noteID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select entries from the 'version' table: %s", err)
+	}
+
+	versions := []models.Version{}
+
+	for rows.Next() {
+		version := models.Version{}
+
+		err := rows.Scan(&version.ID, &version.FullText, &version.CreationDate, &version.Checksum, &version.NoteID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan rows from the 'version' table: %s", err)
+		}
+
+		versions = append(versions, version)
+	}
+
+	return versions, nil
+}
+
 // UpdateNote updates an existing entry in the 'note' table and inserts a new entry in the 'version' table.
 func UpdateNote(dbConn Connection, note models.Note, version models.Version) error {
 	query := "WITH updated_note AS (UPDATE note SET title=$1 WHERE id=$2 RETURNING id) " +
