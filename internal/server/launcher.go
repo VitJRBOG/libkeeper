@@ -47,7 +47,7 @@ func waitForExitSignal(signalToExit chan os.Signal, srv *http.Server,
 	<-signalToExit
 
 	serverShuttingDown(srv, infoLogger)
-	closeDBConnection(dbConn)
+	closeDBConnection(dbConn, infoLogger)
 }
 
 func serverShuttingDown(srv *http.Server, infoLogger *log.Logger) {
@@ -62,11 +62,13 @@ func serverShuttingDown(srv *http.Server, infoLogger *log.Logger) {
 	infoLogger.Println("server exited successfully")
 }
 
-func closeDBConnection(dbConn db.Connection) {
+func closeDBConnection(dbConn db.Connection, infoLogger *log.Logger) {
 	err := dbConn.Conn.Close()
 	if err != nil {
 		log.Printf("error when closing the database connection: %s", err)
 	}
+
+	infoLogger.Println("database connection closed successfully")
 }
 
 func logging(next http.Handler, infoLogger *log.Logger) http.Handler {
