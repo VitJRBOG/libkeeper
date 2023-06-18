@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"libkeeper-api/internal/config"
 	"libkeeper-api/internal/db"
@@ -8,21 +9,63 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"sync"
 	"time"
 )
 
 // Up starts the server.
-func Up(serverCfg config.ServerCfg, dbConn db.Connection) {
+func Up(wg *sync.WaitGroup, signalToExit chan os.Signal,
+	serverCfg config.ServerCfg, dbConn db.Connection) {
 	infoLogger := loggers.NewInfoLogger()
+	srv := serverSettingUp(serverCfg, infoLogger)
+
+	go waitForExitSignal(signalToExit, srv, dbConn, infoLogger)
 
 	handling(dbConn)
 	infoLogger.Println("request handling is ready")
 
-	address := fmt.Sprintf(":%s", serverCfg.Port)
-
-	err := http.ListenAndServe(address, logging(http.DefaultServeMux, infoLogger))
+	err := srv.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatalf("server launch error: %s", err)
+	}
+
+	wg.Done()
+}
+
+func serverSettingUp(serverCfg config.ServerCfg, infoLogger *log.Logger) *http.Server {
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", serverCfg.Port),
+		Handler: logging(http.DefaultServeMux, infoLogger),
+	}
+
+	return srv
+}
+
+func waitForExitSignal(signalToExit chan os.Signal, srv *http.Server,
+	dbConn db.Connection, infoLogger *log.Logger) {
+	<-signalToExit
+
+	serverShuttingDown(srv, infoLogger)
+	closeDBConnection(dbConn)
+}
+
+func serverShuttingDown(srv *http.Server, infoLogger *log.Logger) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := srv.Shutdown(ctx)
+	if err != nil {
+		log.Fatalf("server shutdown failed: %s", err)
+	}
+
+	infoLogger.Println("server exited successfully")
+}
+
+func closeDBConnection(dbConn db.Connection) {
+	err := dbConn.Conn.Close()
+	if err != nil {
+		log.Printf("error when closing the database connection: %s", err)
 	}
 }
 

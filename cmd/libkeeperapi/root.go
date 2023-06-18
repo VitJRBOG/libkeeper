@@ -7,6 +7,10 @@ import (
 	"libkeeper-api/internal/loggers"
 	"libkeeper-api/internal/server"
 	"log"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 )
 
 // Execute starts the main functions of program.
@@ -34,5 +38,28 @@ func Execute() {
 		log.Fatalf("launching is not possible: %s", err)
 	}
 
-	server.Up(serverCfg, dbConn)
+	serverRepresentative := getCompletionHerald()
+
+	wg := sync.WaitGroup{}
+
+	wg.Add(1)
+	go osSignalsReception(&wg, serverRepresentative)
+
+	wg.Add(1)
+	go server.Up(&wg, serverRepresentative, serverCfg, dbConn)
+
+	wg.Wait()
+	loggers.NewInfoLogger().Println("program exited successfully")
+}
+
+func getCompletionHerald() chan os.Signal {
+	serverRepresentative := make(chan os.Signal, 1)
+
+	return serverRepresentative
+}
+
+func osSignalsReception(wg *sync.WaitGroup, serverRepresentative chan os.Signal) {
+	signal.Notify(serverRepresentative, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	wg.Done()
 }
