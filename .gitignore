@@ -5,7 +5,7 @@
 .vscode/
 
 # Binaries
-bin/
+libkeeper-api/bin/
 
 # Other
 junk/
