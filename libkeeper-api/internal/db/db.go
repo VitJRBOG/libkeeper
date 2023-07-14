@@ -108,3 +108,16 @@ func UpdateNote(dbConn Connection, note models.Note, version models.Version) err
 
 	return nil
 }
+
+// DeleteNote deletes an existing entry from the 'note' table and deletes the associated entries from the 'version' table.
+func DeleteNote(dbConn Connection, noteID int) error {
+	query := "WITH deleted_versions AS (DELETE FROM version WHERE note_id = $1 RETURNING note_id) " +
+		"DELETE FROM note WHERE id IN (SELECT note_id FROM deleted_versions)"
+
+	_, err := dbConn.Conn.Exec(query, noteID)
+	if err != nil {
+		return fmt.Errorf("failed to delete the 'note' table entry: %s", err)
+	}
+
+	return nil
+}

@@ -70,6 +70,21 @@ func handling(dbConn db.Connection) {
 				sendError(w, err)
 				return
 			}
+
+		case http.MethodDelete:
+			err := parseRequestParams(r)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			err = deleteNote(dbConn, r)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusNoContent, nil)
 		default:
 			sendError(w, Error{http.StatusMethodNotAllowed, "method not allowed"})
 			return
@@ -94,24 +109,27 @@ func handling(dbConn db.Connection) {
 }
 
 func sendData(w http.ResponseWriter, status int, values interface{}) {
-	response := map[string]interface{}{
-		"response": values,
-	}
-
-	data, err := json.Marshal(response)
-	if err != nil {
-		log.Println(err.Error())
-		sendError(w, err)
-		return
-	}
-
 	w.WriteHeader(status)
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(data)
-	if err != nil {
-		log.Println(err.Error())
-		sendError(w, err)
-		return
+
+	if values != nil {
+		response := map[string]interface{}{
+			"response": values,
+		}
+
+		data, err := json.Marshal(response)
+		if err != nil {
+			log.Println(err.Error())
+			sendError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(data)
+		if err != nil {
+			log.Println(err.Error())
+			sendError(w, err)
+			return
+		}
 	}
 }
 
@@ -326,6 +344,34 @@ func updateNote(dbConn db.Connection, r *http.Request) error {
 		return Error{
 			http.StatusInternalServerError,
 			"failed to update a note",
+		}
+	}
+
+	return nil
+}
+
+func deleteNote(dbConn db.Connection, r *http.Request) error {
+	if r.FormValue("note_id") == "" {
+		return Error{
+			http.StatusBadRequest,
+			"the 'note_id' parameter is empty",
+		}
+	}
+
+	noteID, err := strconv.Atoi(r.FormValue("note_id"))
+	if err != nil {
+		return Error{
+			http.StatusBadRequest,
+			"the 'note_id' parameter must be an integer",
+		}
+	}
+
+	err = db.DeleteNote(dbConn, noteID)
+	if err != nil {
+		log.Printf("failed to delete the note: %s", err)
+		return Error{
+			http.StatusInternalServerError,
+			"failed to delete the note",
 		}
 	}
 
