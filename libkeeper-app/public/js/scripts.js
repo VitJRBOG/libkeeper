@@ -116,3 +116,18 @@ function _formatDate(now, tz) {
 
     return `${year}-${month}-${day} ${hours}:${min}:${sec} ${tz}`
 }
+
+function deleteNote() {
+    let queryString = window.location.search
+    let urlParams = new URLSearchParams(queryString)
+    if (urlParams.has('id')) {
+        let note_id = urlParams.get('id')
+        fetch(`/note?id=${note_id}`, {
+            method: 'delete'
+        }).then(response => {
+            if (response.redirected) {
+                window.location.href = response.url
+            }
+        })
+    }
+}

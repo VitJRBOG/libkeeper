@@ -71,6 +71,14 @@ function makeHandlers(app) {
         res.redirect('/')
     })
 
+    app.delete('/note', function (req, res) {
+        let note_id = req.query.id
+
+        deleteNote(note_id)
+
+        res.redirect('/')
+    })
+
     return app
 }
 
@@ -177,6 +185,22 @@ function createNewNote(values) {
         },
         body: str_params
     })
+
+    let result = {}
+    let body = res.getBody('utf-8')
+    if (body.length > 0) {
+        result = JSON.parse(body)
+    }
+
+    if (result.hasOwnProperty('error')) {
+        console.log(`error: ${result['error']}`)
+    }
+}
+
+function deleteNote(note_id) {
+    let u = `http://${API_HOST}:${API_PORT}/note?` + new URLSearchParams({ note_id: note_id }).toString()
+
+    var res = syncrequest('DELETE', u)
 
     let result = {}
     let body = res.getBody('utf-8')
