@@ -41,7 +41,11 @@
                 <% for(let i = 0; i < notes_list.length; i++) { %>
                 <a href="/note?id=<%= notes_list[i].id %>" class="note-link">
                     <div id="note_<%= notes_list[i].id %>" class="note-announce note-announce-regular">
+                        <% if (notes_list[i].title == "") { %>
+                        <h3>...</h3>
+                        <% } else { %>
                         <h3><%= notes_list[i].title %></h3>
+                        <% } %>
                         <p><%= notes_list[i].c_date %></p>
                     </div>
                 </a>
