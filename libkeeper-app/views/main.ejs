@@ -57,10 +57,28 @@
             <div class="canvas-toolbar">
                 <button class="toolbtn" onclick="createNote(document.getElementById('full_text').value)">
                     <img src="/img/icons/save-note.png" class="toolicon" alt="Save Note" /></button>
-                <button class="toolbtn"><img src="/img/icons/note-history.png" class="toolicon" alt="History" /></button>
+                <button class="toolbtn" onclick="toggleVersionsListDisplay()">
+                    <img src="/img/icons/note-history.png" class="toolicon" alt="History" /></button>
                 <button class="toolbtn"><img src="/img/icons/undo.png" class="toolicon" alt="Undo" /></button>
                 <button class="toolbtn"><img src="/img/icons/redo.png" class="toolicon" alt="Redo" /></button>
                 <button class="toolbtn"><img src="/img/icons/styles.png" class="toolicon" alt="Styles" /></button>
+            </div>
+
+            <div id="versions-list" class="versions-list" style="display: none;">
+                    <% { %>
+                        <% let text = '' %>
+                        <% if(note_versions !== null) { %>
+                            <% for(let i = 0; i < note_versions.length; i++) { %>
+                                <% text = note_versions[i].full_text.substring(0, 42) %>
+                    <a href="#" class="version-link">
+                        <div class="version-announce version-announce-regular">
+                            <h5 class="version-title"><%= text %></p>
+                            <p class="version-date"><%= note_versions[i].c_date %></p>
+                        </div>
+                    </a>
+                            <% } %>
+                        <% } %>
+                    <% } %>
             </div>
 
             <div class="canvas-entry">

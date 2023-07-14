@@ -9,6 +9,16 @@ function highlintNote() {
     }
 }
 
+function toggleVersionsListDisplay() {
+    let tag = document.getElementById('versions-list')
+
+    if (tag.style['display'] == 'none') {
+        tag.style['display'] = 'block'
+    } else if (tag.style['display'] == 'block') {
+        tag.style['display'] = 'none'
+    }
+}
+
 function openNewCanvas() {
     window.location.replace('/')
 }

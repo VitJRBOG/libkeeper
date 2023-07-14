@@ -134,6 +134,55 @@ body {
     white-space: nowrap;
 }
 
+.versions-list {
+    margin-top: 10px;
+    width: 250px;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: black;
+}
+
+.version-link {
+    text-decoration: none;
+    color: #D0D0D0;
+}
+
+.version-announce-regular {
+    background-color: #e3e3e3;
+    border-color: #dcdcdc;
+}
+
+.version-announce-highlinted {
+    background-color: #F9F9F9;
+    border-color: #D0D0D0;
+}
+
+.version-announce {
+    min-height: 50px;
+    margin-bottom: 7px;
+    border: solid;
+    border-width: 2px;
+    border-radius: 5px;
+}
+
+.version-link :hover {
+    background-color: #D0D0D0;
+    border-color: #D0D0D0;
+}
+
+.version-title {
+    margin: 5px 0 2.5px 3px;
+    text-align: left;
+    color: black;
+}
+
+.version-date {
+    margin: 2.5px 3px 0 0;
+    padding: 0;
+    text-align: right;
+    color: gray;
+}
+
 .canvas-entry {
     margin-top: 10px;
     height: 100%;
