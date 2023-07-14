@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Libkeeper</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="/css/vendor/normalize.css" />
+        <link rel="stylesheet" href="/css/main.css" />
+    </head>
+
+    <body>
+        <div class="categories-part">
+            <div class="categories-toolbar">
+                <button class="toolbtn">
+                    <img src="/img/icons/add-folder.png" class="toolicon" alt="Add Folder" />
+                </button>
+                <button class="toolbtn">
+                    <img src="/img/icons/del-folder.png" class="toolicon" alt="Delete Folder" />
+                </button>
+            </div>
+
+            <div class="categories-list">
+                <button class="category-button">
+                    <img src="/img/icons/category-favorites.png" class="category-button-icon" alt="Favorites" />
+                </button>
+                <button class="category-button">
+                    <img src="/img/icons/category-all.png" class="category-button-icon" alt="All" />
+                </button>
+                <button class="category-button">
+                    <img src="/img/icons/category-deleted.png" class="category-button-icon" alt="Deleted" />
+                </button>
+            </div>
+        </div>
+
+        <div class="notes-part">
+            <div class="notes-toolbar">
+                <button class="toolbtn" onclick="openNewCanvas()"><img src="/img/icons/new-note.png" class="toolicon" alt="New Note" /></button>
+                <button class="toolbtn"><img src="/img/icons/del-note.png" class="toolicon" alt="Delete Note" /></button>
+            </div>
+
+            <div class="notes-list">
+                <% for(let i = 0; i < notes_list.length; i++) { %>
+                <a href="/note?id=<%= notes_list[i].id %>" class="note-link">
+                    <div id="note_<%= notes_list[i].id %>" class="note-announce note-announce-regular">
+                        <h3><%= notes_list[i].title %></h3>
+                        <p><%= notes_list[i].c_date %></p>
+                    </div>
+                </a>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="canvas-part">
+            <div class="canvas-toolbar">
+                <button class="toolbtn" onclick="createNote(document.getElementById('full_text').value)">
+                    <img src="/img/icons/save-note.png" class="toolicon" alt="Save Note" /></button>
+                <button class="toolbtn"><img src="/img/icons/note-history.png" class="toolicon" alt="History" /></button>
+                <button class="toolbtn"><img src="/img/icons/undo.png" class="toolicon" alt="Undo" /></button>
+                <button class="toolbtn"><img src="/img/icons/redo.png" class="toolicon" alt="Redo" /></button>
+                <button class="toolbtn"><img src="/img/icons/styles.png" class="toolicon" alt="Styles" /></button>
+            </div>
+
+            <div class="canvas-entry">
+                <% { %>
+                    <% let text = '' %>
+                    <% if(note_versions !== null) { %>
+                        <% text = note_versions[0].full_text %>
+                    <% } %>
+                <textarea id="full_text" class="note-full-text" placeholder="Enter the text..."><%= text %></textarea>
+                <% } %>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="/js/scripts.js"></script>
+        <script type="text/javascript">highlintNote()</script>
+    </body>
+</html>

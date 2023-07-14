@@ -33,3 +33,17 @@ services:
       psql:
         condition: service_healthy
     command: bash -c "./api"
+
+  app:
+    build:
+      context: ./
+      dockerfile: ./docker/app/Dockerfile
+    container_name: libkeeper-app
+    ports:
+      - 9000:9000
+    environment:
+      - APP_HOST=libkeeper-app
+      - APP_PORT=9000
+      - API_HOST=libkeeper-api
+      - API_PORT=8000
+    command: bash -c "node main.js"

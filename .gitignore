@@ -7,6 +7,10 @@
 # Binaries
 libkeeper-api/bin/
 
+# NodeJS
+libkeeper-app/node_modules
+libkeeper-app/package-lock.json
+
 # Other
 junk/
 log.log
