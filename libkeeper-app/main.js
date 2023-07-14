@@ -68,7 +68,7 @@ function makeHandlers(app) {
 
         createNewNote(values)
 
-        res.redirect('/')
+        res.redirect(`/`)
     })
 
     app.delete('/note', function (req, res) {

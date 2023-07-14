@@ -29,6 +29,10 @@ function createNote(full_text) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
+    }).then(response => {
+        if (response.redirected) {
+            window.location.href = response.url
+        }
     })
 }
 
