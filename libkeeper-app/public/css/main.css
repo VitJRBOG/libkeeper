@@ -9,6 +9,15 @@ body {
     padding: 0;
     height: 35px;
     width: 35px;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: black;
+    background-color: #ffffff;
+}
+
+.toolbtn:hover {
+    background-color: #D0D0D0;
+    cursor: pointer;
 }
 
 .toolicon {
@@ -39,6 +48,15 @@ body {
     padding: 0;
     height: 75px;
     width: 75px;
+    background-color: transparent;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: black;
+}
+
+.category-button:hover {
+    background-color: #D0D0D0;
+    cursor: pointer;
 }
 
 .category-button-icon {
@@ -70,7 +88,7 @@ body {
 }
 
 .note-link :hover {
-    background-color: #F9F9F9;
+    background-color: #D0D0D0;
     border-color: #D0D0D0;
 }
 
@@ -80,7 +98,7 @@ body {
 }
 
 .note-announce-highlinted {
-    background-color: #D0D0D0;
+    background-color: #F9F9F9;
     border-color: #D0D0D0;
 }
 
