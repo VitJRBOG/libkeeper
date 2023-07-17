@@ -99,7 +99,10 @@ func SelectVersions(dbConn Connection, noteID int) ([]models.Version, error) {
 func UpdateNote(dbConn Connection, note models.Note, version models.Version) error {
 	query := "WITH updated_note AS (UPDATE note SET title=$1 WHERE id=$2 RETURNING id) " +
 		"INSERT INTO version(full_text, c_date, checksum, note_id) " +
-		"VALUES($3, $4, $5, (SELECT id FROM updated_note))"
+		"SELECT * FROM (SELECT $3 AS full_text, $4 AS c_date, $5 AS checksum, " +
+		"(SELECT id FROM updated_note) AS note_id) AS new_version " +
+		"WHERE NOT EXISTS (SELECT id FROM version WHERE version.note_id = (SELECT id FROM updated_note) " +
+		"AND version.checksum = new_version.checksum)"
 
 	_, err := dbConn.Conn.Exec(query, note.Title, note.ID, version.FullText, version.CreationDate, version.Checksum)
 	if err != nil {
