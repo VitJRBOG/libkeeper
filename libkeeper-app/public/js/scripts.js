@@ -23,13 +23,27 @@ function openNewCanvas() {
     window.location.replace('/')
 }
 
-function createNote(full_text) {
+function handleTheNote(full_text) {
     let title = _composeTitle(full_text)
-
     let c_date = _getDate()
 
-    fetch("/note", {
-        method: 'post',
+    let queryURL = ''
+    let queryMethod = ''
+
+    let queryString = window.location.search
+    let urlParams = new URLSearchParams(queryString)
+    if (urlParams.has('id')) {
+        let note_id = urlParams.get('id')
+
+        queryURL = `/note?id=${note_id}`
+        queryMethod = 'put'
+    } else {
+        queryURL = '/note'
+        queryMethod = 'post'
+    }
+
+    fetch(queryURL, {
+        method: queryMethod,
         body: JSON.stringify({
             full_text: full_text,
             title: title,

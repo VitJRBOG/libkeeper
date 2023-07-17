@@ -71,6 +71,27 @@ function makeHandlers(app) {
         res.redirect(`/`)
     })
 
+    app.put('/note', function (req, res) {
+        let note_id = req.query.id
+
+        let full_text = req.body.full_text
+        let title = req.body.title
+        let c_date = req.body.c_date
+        let checksum = crypto.createHash('md5').update(full_text).digest('hex')
+
+        let values = {
+            full_text: full_text,
+            title: title,
+            c_date: c_date,
+            checksum: checksum,
+            note_id: note_id
+        }
+
+        updateNote(values)
+
+        res.redirect(303, `/note?id=${note_id}`)
+    })
+
     app.delete('/note', function (req, res) {
         let note_id = req.query.id
 
@@ -180,6 +201,38 @@ function createNewNote(values) {
     }
 
     var res = syncrequest('POST', u, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: str_params
+    })
+
+    let result = {}
+    let body = res.getBody('utf-8')
+    if (body.length > 0) {
+        result = JSON.parse(body)
+    }
+
+    if (result.hasOwnProperty('error')) {
+        console.log(`error: ${result['error']}`)
+    }
+}
+
+function updateNote(values) {
+    let u = `http://${API_HOST}:${API_PORT}/note`
+
+    let str_params = ''
+
+    let keys = Object.keys(values)
+
+    for (let i = 0; i < keys.length; i++) {
+        str_params += `${keys[i]}=${values[keys[i]]}`
+        if (i < keys.length - 1) {
+            str_params += '&'
+        }
+    }
+
+    var res = syncrequest('PUT', u, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
