@@ -35,7 +35,8 @@ function makeServerApp() {
 function makeHandlers(app) {
     var data = {
         'notes_list': null,
-        'note_versions': null
+        'note_versions': null,
+        'current_version': null
     }
 
     app.get('/', function (req, res) {
@@ -49,6 +50,16 @@ function makeHandlers(app) {
     app.get('/note', function (req, res) {
         data['notes_list'] = fetchNotesList()
         data['note_versions'] = fetchNoteVersions(req.query.id)
+
+        if (req.query.version_id) {
+            for (let i = 0; i < data['note_versions'].length; i++) {
+                if (data['note_versions'][i].id == req.query.version_id) {
+                    data['current_version'] = data['note_versions'][i]
+                }
+            }
+        } else {
+            data['current_version'] = data['note_versions'][0]
+        }
 
         res.render('main', data)
     })
