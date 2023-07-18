@@ -40,6 +40,7 @@ function makeHandlers(app) {
     }
 
     app.get('/', function (req, res) {
+        data['current_version'] = null
         data['note_versions'] = null
 
         data['notes_list'] = fetchNotesList()
