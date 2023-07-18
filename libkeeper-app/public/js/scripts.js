@@ -81,7 +81,7 @@ function _getDate() {
 }
 
 function _getTimezone(now) {
-    let tzOffset = now.getTimezoneOffset()
+    let tzOffset = now.getTimezoneOffset() * -1
     let tz = (tzOffset / 60)
 
     if (tz > 0) {

@@ -194,7 +194,7 @@ function createNewNote(values) {
     let keys = Object.keys(values)
 
     for (let i = 0; i < keys.length; i++) {
-        str_params += `${keys[i]}=${values[keys[i]]}`
+        str_params += `${keys[i]}=${encodeURIComponent(values[keys[i]])}`
         if (i < keys.length - 1) {
             str_params += '&'
         }
@@ -226,7 +226,7 @@ function updateNote(values) {
     let keys = Object.keys(values)
 
     for (let i = 0; i < keys.length; i++) {
-        str_params += `${keys[i]}=${values[keys[i]]}`
+        str_params += `${keys[i]}=${encodeURIComponent(values[keys[i]])}`
         if (i < keys.length - 1) {
             str_params += '&'
         }
