@@ -183,6 +183,10 @@ function fetchNoteVersions(note_id) {
         console.log(`error: ${result['error']}`)
     }
 
+    for (let i = 0; i < note_versions.length; i++) {
+        note_versions[i]['c_date'] = _formatDate(note_versions[i]['c_date'])
+    }
+
     return note_versions
 }
 
