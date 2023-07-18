@@ -73,7 +73,7 @@
                                 <% let note_id = note_versions[i].note_id %>
                                 <% let version_id = note_versions[i].id %>
                     <a href="/note?id=<%= note_id %>&version_id=<%= version_id %>" class="version-link">
-                        <div class="version-announce version-announce-regular">
+                        <div id="version_<%= version_id %>" class="version-announce version-announce-regular">
                             <h5 class="version-title"><%= text %></p>
                             <p class="version-date"><%= note_versions[i].c_date %></p>
                         </div>
@@ -96,5 +96,6 @@
 
         <script type="text/javascript" src="/js/scripts.js"></script>
         <script type="text/javascript">highlintNote()</script>
+        <script type="text/javascript">highlintVersion()</script>
     </body>
 </html>

@@ -9,6 +9,17 @@ function highlintNote() {
     }
 }
 
+function highlintVersion() {
+    let queryString = window.location.search
+    let urlParams = new URLSearchParams(queryString)
+    if (urlParams.has('version_id')) {
+        let elementID = urlParams.get('version_id')
+        let tag = document.getElementById(`version_${elementID}`)
+        tag.classList.remove('version-announce-regular')
+        tag.classList.add('version-announce-highlinted')
+    }
+}
+
 function toggleVersionsListDisplay() {
     let tag = document.getElementById('versions-list')
 
