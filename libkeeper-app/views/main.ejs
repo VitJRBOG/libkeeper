@@ -25,9 +25,11 @@
                 <button class="category-button">
                     <img src="/img/icons/category-all.png" class="category-button-icon" alt="All" />
                 </button>
-                <button class="category-button">
-                    <img src="/img/icons/category-deleted.png" class="category-button-icon" alt="Deleted" />
-                </button>
+                <% for(let i = 0; i < categories_list.length; i++) { %>
+                    <button class="category-button">
+                        <img src="<%= categories_list[i].icon %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
+                    </button>
+                <% } %>
             </div>
         </div>
 

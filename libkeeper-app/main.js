@@ -1,8 +1,11 @@
 const express = require('express')
 const ejs = require('ejs')
 const syncrequest = require('sync-request')
-const crypto = require('crypto');
+const crypto = require('crypto')
+const fs = require('fs')
 
+const PUBLIC_DIR = String(process.env.PUBLIC_DIR)
+const VIEWS_DIR = String(process.env.VIEWS_DIR)
 const APP_PORT = Number(process.env.APP_PORT)
 const APP_HOST = String(process.env.APP_HOST)
 const API_PORT = Number(process.env.API_PORT)
@@ -22,10 +25,10 @@ function LaunchServer() {
 function makeServerApp() {
     const app = express()
 
-    app.set('views', './views')
+    app.set('views', `${VIEWS_DIR}`)
     app.set('view engine', 'ejs')
 
-    app.use(express.static('./public'))
+    app.use(express.static(`${PUBLIC_DIR}`))
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
 
@@ -34,14 +37,19 @@ function makeServerApp() {
 
 function makeHandlers(app) {
     var data = {
+        'categories_list': null,
         'notes_list': null,
         'note_versions': null,
         'current_version': null
     }
 
     app.get('/', function (req, res) {
+        data['categories_list'] = null
         data['current_version'] = null
         data['note_versions'] = null
+
+        data['categories_list'] = fetchCategoriesList()
+        data['categories_list'] = _categoriesIconFinding(data['categories_list'])
 
         data['notes_list'] = fetchNotesList()
 
@@ -49,6 +57,9 @@ function makeHandlers(app) {
     })
 
     app.get('/note', function (req, res) {
+        data['categories_list'] = fetchCategoriesList()
+        data['categories_list'] = _categoriesIconFinding(data['categories_list'])
+
         data['notes_list'] = fetchNotesList()
         data['note_versions'] = fetchNoteVersions(req.query.id)
 
@@ -70,12 +81,19 @@ function makeHandlers(app) {
         let title = req.body.title
         let c_date = req.body.c_date
         let checksum = crypto.createHash('md5').update(full_text).digest('hex')
+        let categories = ''
+        if (req.body.categories !== '' && typeof req.body.categories !== 'undefined') {
+            categories = req.body.categories
+        } else {
+            categories = 'uncategorised'
+        }
 
         let values = {
             full_text: full_text,
             title: title,
             c_date: c_date,
-            checksum: checksum
+            checksum: checksum,
+            categories: categories
         }
 
         createNewNote(values)
@@ -113,6 +131,35 @@ function makeHandlers(app) {
     })
 
     return app
+}
+
+function fetchCategoriesList() {
+    let u = `http://${API_HOST}:${API_PORT}/categories`
+
+    var res = syncrequest('GET', u)
+
+    let result = JSON.parse(res.getBody('utf-8'))
+
+    let categories_list = null
+    if (result.hasOwnProperty('response')) {
+        categories_list = result['response']
+    } else if (result.hasOwnProperty('error')) {
+        console.log(`error: ${result['error']}`)
+    }
+
+    return categories_list
+}
+
+function _categoriesIconFinding(categories_list) {
+    for (let i = 0; i < categories_list.length; i++) {
+        if (fs.existsSync(`${PUBLIC_DIR}/img/icons/category-${categories_list[i]['name']}.png`)) {
+            categories_list[i]['icon'] = `/img/icons/category-${categories_list[i]['name']}.png`
+        } else {
+            categories_list[i]['icon'] = `/img/icons/category-uncategorised.png`
+        }
+    }
+
+    return categories_list
 }
 
 function fetchNotesList() {
