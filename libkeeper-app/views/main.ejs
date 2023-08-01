@@ -10,33 +10,50 @@
     <body>
         <div class="categories-part">
             <div class="categories-toolbar">
-                <button class="toolbtn">
+                <button class="toolbtn tooltip">
+                    <span class="tooltiptext">Add category</span>
                     <img src="/img/icons/add-folder.png" class="toolicon" alt="Add Folder" />
                 </button>
-                <button class="toolbtn">
+                <button class="toolbtn tooltip">
+                    <span class="tooltiptext">Delete category</span>
                     <img src="/img/icons/del-folder.png" class="toolicon" alt="Delete Folder" />
                 </button>
             </div>
 
             <div class="categories-list">
-                <button class="category-button">
+                <button class="category-button tooltip">
+                    <span class="tooltiptext">Favorites</span>
                     <img src="/img/icons/category-favorites.png" class="category-button-icon" alt="Favorites" />
                 </button>
-                <button class="category-button">
+                <button class="category-button tooltip">
+                    <span class="tooltiptext">All</span>
                     <img src="/img/icons/category-all.png" class="category-button-icon" alt="All" />
                 </button>
                 <% for(let i = 0; i < categories_list.length; i++) { %>
-                    <button class="category-button">
+                    <% if (categories_list[i].name != 'trashed') { %>
+                    <button class="category-button tooltip">
+                        <span class="tooltiptext"><%= categories_list[i].name %></span>
                         <img src="<%= categories_list[i].icon %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
                     </button>
+                    <% } %>
                 <% } %>
+                <button class="category-button tooltip">
+                    <span class="tooltiptext">Trashed</span>
+                    <img src="/img/icons/category-trashed.png" class="category-button-icon" alt="All" />
+                </button>
             </div>
         </div>
 
         <div class="notes-part">
             <div class="notes-toolbar">
-                <button class="toolbtn" onclick="openNewCanvas()"><img src="/img/icons/new-note.png" class="toolicon" alt="New Note" /></button>
-                <button class="toolbtn" onclick="deleteNote()"><img src="/img/icons/del-note.png" class="toolicon" alt="Delete Note" /></button>
+                <button class="toolbtn tooltip" onclick="openNewCanvas()">
+                    <span class="tooltiptext">New Note</span>
+                    <img src="/img/icons/new-note.png" class="toolicon" alt="New Note" />
+                </button>
+                <button class="toolbtn tooltip" onclick="deleteNote()">
+                    <span class="tooltiptext">Delete Note</span>
+                    <img src="/img/icons/del-note.png" class="toolicon" alt="Delete Note" />
+                </button>
             </div>
 
             <div class="notes-list">
@@ -57,14 +74,29 @@
 
         <div class="canvas-part">
             <div class="canvas-toolbar">
-                <button class="toolbtn" onclick="handleTheNote(document.getElementById('full_text').value)">
+                <button class="toolbtn tooltip" onclick="handleTheNote(document.getElementById('full_text').value)">
+                    <span class="tooltiptext">Save Note</span>
                     <img src="/img/icons/save-note.png" class="toolicon" alt="Save Note" /></button>
-                <button class="toolbtn" onclick="toggleVersionsListDisplay()">
-                    <img src="/img/icons/note-history.png" class="toolicon" alt="History" /></button>
-                <button class="toolbtn"><img src="/img/icons/undo.png" class="toolicon" alt="Undo" /></button>
-                <button class="toolbtn"><img src="/img/icons/redo.png" class="toolicon" alt="Redo" /></button>
-                <button class="toolbtn"><img src="/img/icons/styles.png" class="toolicon" alt="Styles" /></button>
-                <button class="toolbtn"><img src="/img/icons/select-folder.png" class="toolicon" alt="Categories" /></button>
+                <button class="toolbtn tooltip" onclick="toggleVersionsListDisplay()">
+                    <span class="tooltiptext">History</span>
+                    <img src="/img/icons/note-history.png" class="toolicon" alt="History" />
+                </button>
+                <button class="toolbtn tooltip">
+                    <span class="tooltiptext">Undo</span>
+                    <img src="/img/icons/undo.png" class="toolicon" alt="Undo" />
+                </button>
+                <button class="toolbtn tooltip">
+                    <span class="tooltiptext">Redo</span>
+                    <img src="/img/icons/redo.png" class="toolicon" alt="Redo" />
+                </button>
+                <button class="toolbtn tooltip">
+                    <span class="tooltiptext">Styles</span>
+                    <img src="/img/icons/styles.png" class="toolicon" alt="Styles" />
+                </button>
+                <button class="toolbtn tooltip">
+                    <span class="tooltiptext">Categories</span>
+                    <img src="/img/icons/select-folder.png" class="toolicon" alt="Categories" />
+                </button>
             </div>
 
             <div id="versions-list" class="versions-list" style="display: none;">
