@@ -172,6 +172,44 @@ func SelectNotes(dbConn Connection) ([]models.Note, error) {
 	return notes, nil
 }
 
+// UpdateNoteCategories inserts new records and deletes old ones by 'note_id' in the 'note_category' table.
+func UpdateNoteCategories(dbConn Connection, note models.Note) error {
+	beginOfQuery := "WITH new_relations AS ("
+	endOfQuery := "), create_relations AS (INSERT INTO note_category (note_id, category_id) " +
+		"SELECT * FROM new_relations WHERE NOT EXISTS (" +
+		"SELECT id FROM note_category " +
+		"WHERE note_category.note_id = new_relations.note_id AND " +
+		"note_category.category_id = new_relations.category_id)) " +
+		"DELETE FROM note_category " +
+		"WHERE note_id IN (SELECT note_id FROM new_relations) AND category_id NOT IN " +
+		"(SELECT category_id FROM new_relations)"
+
+	values := []interface{}{}
+	queryWithValues := ""
+	n := 1
+
+	for i, category := range note.Categories {
+		queryWithValues += fmt.Sprintf("SELECT (SELECT id FROM note WHERE id = $%d) AS note_id, "+
+			"(SELECT id FROM category WHERE name = $%d) AS category_id",
+			n, n+1)
+		if i < len(note.Categories)-1 {
+			queryWithValues += " UNION ALL "
+		}
+
+		n += 2
+		values = append(values, note.ID, category)
+	}
+
+	query := beginOfQuery + queryWithValues + endOfQuery
+
+	_, err := dbConn.Conn.Exec(query, values...)
+	if err != nil {
+		return fmt.Errorf("failed to update the 'note_category' entries: %s", err)
+	}
+
+	return nil
+}
+
 // SelectVersions selects entries from the "version" table by the value of "note_id" field. Returns them sorted by DESC.
 func SelectVersions(dbConn Connection, noteID int) ([]models.Version, error) {
 	query := "SELECT * FROM version WHERE note_id = $1 ORDER BY c_date DESC"

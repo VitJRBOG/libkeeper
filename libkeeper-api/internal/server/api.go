@@ -538,6 +538,19 @@ func updateNote(dbConn db.Connection, r *http.Request) error {
 		}
 	}
 
+	if r.PostFormValue("categories") != "" {
+		note.Categories = strings.Split(r.PostFormValue("categories"), ",")
+
+		err = db.UpdateNoteCategories(dbConn, note)
+		if err != nil {
+			log.Printf("failed to update note categories: %s", err)
+			return Error{
+				http.StatusInternalServerError,
+				"failed to update note categories",
+			}
+		}
+	}
+
 	return nil
 }
 
