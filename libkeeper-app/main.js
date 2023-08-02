@@ -40,11 +40,13 @@ function makeHandlers(app) {
         'categories_list': null,
         'notes_list': null,
         'note_versions': null,
+        'current_note': null,
         'current_version': null
     }
 
     app.get('/', function (req, res) {
         data['categories_list'] = null
+        data['current_note'] = null
         data['current_version'] = null
         data['note_versions'] = null
 
@@ -61,6 +63,13 @@ function makeHandlers(app) {
         data['categories_list'] = _categoriesIconFinding(data['categories_list'])
 
         data['notes_list'] = fetchNotesList()
+
+        for (let i = 0; i < data['notes_list'].length; i++) {
+            if (data['notes_list'][i].id == req.query.id) {
+                data['current_note'] = data['notes_list'][i]
+            }
+        }
+
         data['note_versions'] = fetchNoteVersions(req.query.id)
 
         if (req.query.version_id) {
@@ -82,7 +91,7 @@ function makeHandlers(app) {
         let c_date = req.body.c_date
         let checksum = crypto.createHash('md5').update(full_text).digest('hex')
         let categories = ''
-        if (req.body.categories !== '' && typeof req.body.categories !== 'undefined') {
+        if (req.body.categories.length > 0 && typeof req.body.categories !== 'undefined') {
             categories = req.body.categories
         } else {
             categories = 'uncategorised'
@@ -108,13 +117,20 @@ function makeHandlers(app) {
         let title = req.body.title
         let c_date = req.body.c_date
         let checksum = crypto.createHash('md5').update(full_text).digest('hex')
+        let categories = ''
+        if (req.body.categories.length > 0 && typeof req.body.categories !== 'undefined') {
+            categories = req.body.categories
+        } else {
+            categories = 'uncategorised'
+        }
 
         let values = {
             full_text: full_text,
             title: title,
             c_date: c_date,
             checksum: checksum,
-            note_id: note_id
+            note_id: note_id,
+            categories: categories,
         }
 
         updateNote(values)

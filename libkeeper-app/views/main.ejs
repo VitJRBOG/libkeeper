@@ -93,7 +93,7 @@
                     <span class="tooltiptext">Styles</span>
                     <img src="/img/icons/styles.png" class="toolicon" alt="Styles" />
                 </button>
-                <button class="toolbtn tooltip">
+                <button class="toolbtn tooltip" onclick="toggleCategoriesListDisplay()">
                     <span class="tooltiptext">Categories</span>
                     <img src="/img/icons/select-folder.png" class="toolicon" alt="Categories" />
                 </button>
@@ -116,6 +116,27 @@
                             <% } %>
                         <% } %>
                     <% } %>
+            </div>
+
+            <div id="note-categories-list" class="note-categories-list" style="visibility: hidden;">
+                <% { %>
+                <ul>
+                    <% for (let i = 0; i < categories_list.length; i++) { %>
+                        <% if (categories_list[i].name != 'uncategorised' && categories_list[i].name != 'trashed') { %>
+                            <% let checked = false %>
+                            <% if (current_note !== null) { %>
+                                <% if (current_note.categories.includes(categories_list[i].name, 0)) { %>
+                                    <% checked = true %>
+                                <% } %>
+                            <% } %>
+                    <li>
+                        <input type="checkbox" <% if (checked) {%>checked<% } %>>
+                        <label><%= categories_list[i].name %></label>
+                    </li>
+                        <% } %>
+                    <% } %>
+                </ul>
+                <% } %>
             </div>
 
             <div class="canvas-entry">

@@ -30,6 +30,16 @@ function toggleVersionsListDisplay() {
     }
 }
 
+function toggleCategoriesListDisplay() {
+    let tag = document.getElementById('note-categories-list')
+
+    if (tag.style['visibility'] == 'hidden') {
+        tag.style['visibility'] = 'visible'
+    } else if (tag.style['visibility'] == 'visible') {
+        tag.style['visibility'] = 'hidden'
+    }
+}
+
 function openNewCanvas() {
     window.location.replace('/')
 }
@@ -37,6 +47,7 @@ function openNewCanvas() {
 function handleTheNote(full_text) {
     let title = _composeTitle(full_text)
     let c_date = _getDate()
+    let categories = _getCategories()
 
     let queryURL = ''
     let queryMethod = ''
@@ -58,7 +69,8 @@ function handleTheNote(full_text) {
         body: JSON.stringify({
             full_text: full_text,
             title: title,
-            c_date: c_date
+            c_date: c_date,
+            categories: categories,
         }),
         headers: {
             'Accept': 'application/json',
@@ -154,6 +166,21 @@ function _formatDate(now, tz) {
     }
 
     return `${year}-${month}-${day} ${hours}:${min}:${sec} ${tz}`
+}
+
+function _getCategories() {
+    let checkboxes = document.getElementById('note-categories-list').getElementsByTagName('ul')[0].getElementsByTagName('li')
+
+    let categories = []
+
+    for (let i = 0; i < checkboxes.length; i++) {
+        console.log(checkboxes[i])
+        if (checkboxes[i].getElementsByTagName('input')[0].checked) {
+            categories.push(checkboxes[i].getElementsByTagName('label')[0].textContent)
+        }
+    }
+
+    return categories
 }
 
 function deleteNote() {

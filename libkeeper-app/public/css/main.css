@@ -203,6 +203,22 @@ body {
     color: gray;
 }
 
+.note-categories-list {
+    position: absolute;
+    margin: 2px 0 0 155px;
+    padding: 15px 25px 15px 25px;
+    background-color: #fff;
+    border: solid;
+    border-width: 1px;
+    border-radius: 5px;
+}
+
+.note-categories-list > ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
 .canvas-entry {
     margin-top: 10px;
     height: 100%;
