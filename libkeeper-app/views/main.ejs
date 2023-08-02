@@ -21,23 +21,23 @@
             </div>
 
             <div class="categories-list">
-                <button class="category-button tooltip">
+                <button class="category-button tooltip" onclick="filterByCategory('Favorites')">
                     <span class="tooltiptext">Favorites</span>
                     <img src="/img/icons/category-favorites.png" class="category-button-icon" alt="Favorites" />
                 </button>
-                <button class="category-button tooltip">
+                <button class="category-button tooltip" onclick="filterByCategory('All')">
                     <span class="tooltiptext">All</span>
                     <img src="/img/icons/category-all.png" class="category-button-icon" alt="All" />
                 </button>
                 <% for(let i = 0; i < categories_list.length; i++) { %>
                     <% if (categories_list[i].name != 'trashed') { %>
-                    <button class="category-button tooltip">
+                    <button class="category-button tooltip" onclick="filterByCategory('<%= categories_list[i].name %>')">
                         <span class="tooltiptext"><%= categories_list[i].name %></span>
                         <img src="<%= categories_list[i].icon %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
                     </button>
                     <% } %>
                 <% } %>
-                <button class="category-button tooltip">
+                <button class="category-button tooltip" onclick="filterByCategory('Trashed')">
                     <span class="tooltiptext">Trashed</span>
                     <img src="/img/icons/category-trashed.png" class="category-button-icon" alt="All" />
                 </button>
@@ -58,7 +58,14 @@
 
             <div class="notes-list">
                 <% for(let i = 0; i < notes_list.length; i++) { %>
-                <a href="/note?id=<%= notes_list[i].id %>" class="note-link">
+                    <% let link = '/note' %>
+                    <% if (current_category !== null) { %>
+                        <% link += '?category=' + encodeURIComponent(current_category) + '&' %>
+                    <% } else { %>
+                        <% link += '?' %>
+                    <% } %>
+                    <% link += "id=" + notes_list[i].id %>
+                <a href=<%= link %> class="note-link">
                     <div id="note_<%= notes_list[i].id %>" class="note-announce note-announce-regular">
                         <% if (notes_list[i].title == "") { %>
                         <h3>...</h3>

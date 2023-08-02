@@ -40,6 +40,15 @@ function toggleCategoriesListDisplay() {
     }
 }
 
+function filterByCategory(category) {
+    if (category === 'All') {
+        window.location.replace('/')
+    } else {
+        let newLocation = `/?category=${encodeURIComponent(category)}`
+        window.location.replace(newLocation)
+    }
+}
+
 function openNewCanvas() {
     window.location.replace('/')
 }

@@ -40,12 +40,14 @@ function makeHandlers(app) {
         'categories_list': null,
         'notes_list': null,
         'note_versions': null,
+        'current_category': null,
         'current_note': null,
         'current_version': null
     }
 
     app.get('/', function (req, res) {
         data['categories_list'] = null
+        data['current_category'] = null
         data['current_note'] = null
         data['current_version'] = null
         data['note_versions'] = null
@@ -55,6 +57,16 @@ function makeHandlers(app) {
 
         data['notes_list'] = fetchNotesList()
 
+        if (typeof req.query.category !== 'undefined') {
+            data['current_category'] = decodeURIComponent(req.query.category)
+            for (let i = 0; i < data['notes_list'].length; i++) {
+                if (!data['notes_list'][i].categories.includes(data['current_category'])) {
+                    data['notes_list'].splice(i, 1)
+                    i--
+                }
+            }
+        }
+
         res.render('main', data)
     })
 
@@ -63,6 +75,16 @@ function makeHandlers(app) {
         data['categories_list'] = _categoriesIconFinding(data['categories_list'])
 
         data['notes_list'] = fetchNotesList()
+
+        if (typeof req.query.category !== 'undefined') {
+            data['current_category'] = decodeURIComponent(req.query.category)
+            for (let i = 0; i < data['notes_list'].length; i++) {
+                if (!data['notes_list'][i].categories.includes(data['current_category'])) {
+                    data['notes_list'].splice(i, 1)
+                    i--
+                }
+            }
+        }
 
         for (let i = 0; i < data['notes_list'].length; i++) {
             if (data['notes_list'][i].id == req.query.id) {
