@@ -29,6 +29,7 @@ body {
 }
 
 .tooltiptext {
+    pointer-events: none;
     visibility: hidden;
     position: absolute;
     margin-top: 16px;
@@ -46,6 +47,7 @@ body {
 
 .tooltip:hover .tooltiptext {
     visibility: visible;
+    transition-delay: 0.5s;
 }
 
 /* Categories part */
