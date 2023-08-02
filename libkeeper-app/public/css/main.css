@@ -155,11 +155,20 @@ body {
 }
 
 .versions-list {
-    margin-top: 10px;
+    position: absolute;
+    margin: 2px 0 0 -80px;
+    padding: 7px 7px 0 7px;
     width: 250px;
+    background-color: #fff;
+    border-style: solid;
     border-width: 1px;
     border-radius: 5px;
     border-color: black;
+}
+
+.empty-versions-list-tip {
+    margin: 0 0 7px 0;
+    text-align: center;
 }
 
 .version-link {

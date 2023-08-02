@@ -99,23 +99,25 @@
                 </button>
             </div>
 
-            <div id="versions-list" class="versions-list" style="display: none;">
-                    <% { %>
-                        <% let text = '' %>
-                        <% if(note_versions !== null) { %>
-                            <% for(let i = 0; i < note_versions.length; i++) { %>
-                                <% text = note_versions[i].full_text.substring(0, 42) %>
-                                <% let note_id = note_versions[i].note_id %>
-                                <% let version_id = note_versions[i].id %>
-                    <a href="/note?id=<%= note_id %>&version_id=<%= version_id %>" class="version-link">
-                        <div id="version_<%= version_id %>" class="version-announce version-announce-regular">
-                            <h5 class="version-title"><%= text %></p>
-                            <p class="version-date"><%= note_versions[i].c_date %></p>
-                        </div>
-                    </a>
-                            <% } %>
+            <div id="versions-list" class="versions-list" style="visibility: hidden;">
+                <% { %>
+                    <% let text = '' %>
+                    <% if(note_versions !== null) { %>
+                        <% for(let i = 0; i < note_versions.length; i++) { %>
+                            <% text = note_versions[i].full_text.substring(0, 42) %>
+                            <% let note_id = note_versions[i].note_id %>
+                            <% let version_id = note_versions[i].id %>
+                <a href="/note?id=<%= note_id %>&version_id=<%= version_id %>" class="version-link">
+                    <div id="version_<%= version_id %>" class="version-announce version-announce-regular">
+                        <h5 class="version-title"><%= text %></p>
+                        <p class="version-date"><%= note_versions[i].c_date %></p>
+                    </div>
+                </a>
                         <% } %>
+                    <% } else { %>
+                <div class="empty-versions-list-tip">no versions for this note</div>
                     <% } %>
+                <% } %>
             </div>
 
             <div id="note-categories-list" class="note-categories-list" style="visibility: hidden;">

@@ -23,10 +23,10 @@ function highlintVersion() {
 function toggleVersionsListDisplay() {
     let tag = document.getElementById('versions-list')
 
-    if (tag.style['display'] == 'none') {
-        tag.style['display'] = 'block'
-    } else if (tag.style['display'] == 'block') {
-        tag.style['display'] = 'none'
+    if (tag.style['visibility'] == 'hidden') {
+        tag.style['visibility'] = 'visible'
+    } else if (tag.style['visibility'] == 'visible') {
+        tag.style['visibility'] = 'hidden'
     }
 }
 
