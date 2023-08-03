@@ -20,6 +20,16 @@ function highlintVersion() {
     }
 }
 
+function toggleCategoryCreationPromptDisplay() {
+    let tag = document.getElementById('category-creation-prompt')
+
+    if (tag.style['visibility'] == 'hidden') {
+        tag.style['visibility'] = 'visible'
+    } else if (tag.style['visibility'] == 'visible') {
+        tag.style['visibility'] = 'hidden'
+    }
+}
+
 function toggleVersionsListDisplay() {
     let tag = document.getElementById('versions-list')
 

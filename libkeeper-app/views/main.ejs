@@ -10,7 +10,7 @@
     <body>
         <div class="categories-part">
             <div class="categories-toolbar">
-                <button class="toolbtn tooltip">
+                <button class="toolbtn tooltip" onclick="toggleCategoryCreationPromptDisplay()">
                     <span class="tooltiptext">Add category</span>
                     <img src="/img/icons/add-folder.png" class="toolicon" alt="Add Folder" />
                 </button>
@@ -18,6 +18,13 @@
                     <span class="tooltiptext">Delete category</span>
                     <img src="/img/icons/del-folder.png" class="toolicon" alt="Delete Folder" />
                 </button>
+            </div>
+
+            <div id="category-creation-prompt" class="category-creation-prompt" style="visibility: hidden;">
+                <form action="/category" method="post">
+                    <input type="text" name="category_name" placeholder="Enter a category name...">
+                    <button type="submit">Create</button>
+                </form>
             </div>
 
             <div class="categories-list">

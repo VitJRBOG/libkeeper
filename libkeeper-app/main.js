@@ -70,6 +70,12 @@ function makeHandlers(app) {
         res.render('main', data)
     })
 
+    app.post('/category', function (req, res) {
+        createCategory(req.body.category_name)
+
+        res.redirect(`/`)
+    })
+
     app.get('/note', function (req, res) {
         data['categories_list'] = fetchCategoriesList()
         data['categories_list'] = _categoriesIconFinding(data['categories_list'])
@@ -198,6 +204,29 @@ function _categoriesIconFinding(categories_list) {
     }
 
     return categories_list
+}
+
+function createCategory(category_name) {
+    let u = `http://${API_HOST}:${API_PORT}/category`
+
+    let str_params = `name=${encodeURIComponent(category_name)}`
+
+    var res = syncrequest('POST', u, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: str_params
+    })
+
+    let result = {}
+    let body = res.getBody('utf-8')
+    if (body.length > 0) {
+        result = JSON.parse(body)
+    }
+
+    if (result.hasOwnProperty('error')) {
+        console.log(`error: ${result['error']}`)
+    }
 }
 
 function fetchNotesList() {
