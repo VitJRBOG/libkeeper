@@ -14,10 +14,16 @@
                     <span class="tooltiptext">Add category</span>
                     <img src="/img/icons/add-folder.png" class="toolicon" alt="Add Folder" />
                 </button>
-                <button class="toolbtn tooltip">
+                <% { %>
+                    <% let need_to_disable = false %>
+                    <% if (current_category === null || current_category.immutable == 1) { %>
+                        <% need_to_disable = true %>
+                    <% } %>
+                <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } %>>
                     <span class="tooltiptext">Delete category</span>
                     <img src="/img/icons/del-folder.png" class="toolicon" alt="Delete Folder" />
                 </button>
+                <% } %>
             </div>
 
             <div id="category-creation-prompt" class="category-creation-prompt" style="visibility: hidden;">
@@ -33,7 +39,7 @@
                     <img src="/img/icons/category-all.png" class="category-button-icon" alt="All" />
                 </button>
                 <% for(let i = 0; i < categories_list.length; i++) { %>
-                    <% if (categories_list[i].name != 'trashed') { %>
+                    <% if (categories_list[i].name != 'Trashed') { %>
                     <button class="category-button tooltip" onclick="filterByCategory('<%= categories_list[i].name %>')">
                         <span class="tooltiptext"><%= categories_list[i].name %></span>
                         <img src="<%= categories_list[i].icon %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
@@ -63,7 +69,7 @@
                 <% for(let i = 0; i < notes_list.length; i++) { %>
                     <% let link = '/note' %>
                     <% if (current_category !== null) { %>
-                        <% link += '?category=' + encodeURIComponent(current_category) + '&' %>
+                        <% link += '?category=' + encodeURIComponent(current_category.name) + '&' %>
                     <% } else { %>
                         <% link += '?' %>
                     <% } %>
@@ -134,7 +140,7 @@
                 <% { %>
                 <ul>
                     <% for (let i = 0; i < categories_list.length; i++) { %>
-                        <% if (categories_list[i].name != 'uncategorised' && categories_list[i].name != 'trashed') { %>
+                        <% if (categories_list[i].name != 'Uncategorised' && categories_list[i].name != 'Trashed') { %>
                             <% let checked = false %>
                             <% if (current_note !== null) { %>
                                 <% if (current_note.categories.includes(categories_list[i].name, 0)) { %>

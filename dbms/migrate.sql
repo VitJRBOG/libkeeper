@@ -40,4 +40,4 @@ CREATE TABLE note_category (
 );
 
 INSERT INTO category(name, immutable) VALUES
-    ('uncategorised', 1), ('trashed', 1);
+    ('Uncategorised', 1), ('Trashed', 1);

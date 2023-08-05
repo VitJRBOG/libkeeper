@@ -15,9 +15,13 @@ body {
     background-color: #ffffff;
 }
 
-.toolbtn:hover {
+.toolbtn:hover:enabled {
     background-color: #D0D0D0;
     cursor: pointer;
+}
+
+.toolbtn:disabled {
+    background-color: #ededed;
 }
 
 .toolicon {

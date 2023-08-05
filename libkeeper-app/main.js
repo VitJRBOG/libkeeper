@@ -58,9 +58,14 @@ function makeHandlers(app) {
         data['notes_list'] = fetchNotesList()
 
         if (typeof req.query.category !== 'undefined') {
-            data['current_category'] = decodeURIComponent(req.query.category)
+            let selectedCategory = decodeURIComponent(req.query.category)
+            for (let i = 0; i < data['categories_list'].length; i++) {
+                if (data['categories_list'][i].name === selectedCategory) {
+                    data['current_category'] = data['categories_list'][i]
+                }
+            }
             for (let i = 0; i < data['notes_list'].length; i++) {
-                if (!data['notes_list'][i].categories.includes(data['current_category'])) {
+                if (!data['notes_list'][i].categories.includes(data['current_category'].name)) {
                     data['notes_list'].splice(i, 1)
                     i--
                 }
@@ -83,9 +88,14 @@ function makeHandlers(app) {
         data['notes_list'] = fetchNotesList()
 
         if (typeof req.query.category !== 'undefined') {
-            data['current_category'] = decodeURIComponent(req.query.category)
+            let selectedCategory = decodeURIComponent(req.query.category)
+            for (let i = 0; i < data['categories_list'].length; i++) {
+                if (data['categories_list'][i].name === selectedCategory) {
+                    data['current_category'] = data['categories_list'][i]
+                }
+            }
             for (let i = 0; i < data['notes_list'].length; i++) {
-                if (!data['notes_list'][i].categories.includes(data['current_category'])) {
+                if (!data['notes_list'][i].categories.includes(data['current_category'].name)) {
                     data['notes_list'].splice(i, 1)
                     i--
                 }
@@ -122,7 +132,7 @@ function makeHandlers(app) {
         if (req.body.categories.length > 0 && typeof req.body.categories !== 'undefined') {
             categories = req.body.categories
         } else {
-            categories = 'uncategorised'
+            categories = 'Uncategorised'
         }
 
         let values = {
@@ -149,7 +159,7 @@ function makeHandlers(app) {
         if (req.body.categories.length > 0 && typeof req.body.categories !== 'undefined') {
             categories = req.body.categories
         } else {
-            categories = 'uncategorised'
+            categories = 'Uncategorised'
         }
 
         let values = {
