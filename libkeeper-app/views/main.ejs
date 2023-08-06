@@ -19,7 +19,7 @@
                     <% if (current_category === null || current_category.immutable == 1) { %>
                         <% need_to_disable = true %>
                     <% } %>
-                <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } %>>
+                <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } else { %> onclick="deleteCategory('<%= current_category.id %>', '<%= current_category.immutable %>')"<% } %>>
                     <span class="tooltiptext">Delete category</span>
                     <img src="/img/icons/del-folder.png" class="toolicon" alt="Delete Folder" />
                 </button>
@@ -140,20 +140,20 @@
                 <% { %>
                     <% if (categories_list.length > 2) { %>
                 <ul>
-                    <% for (let i = 0; i < categories_list.length; i++) { %>
-                        <% if (categories_list[i].name != 'Uncategorised' && categories_list[i].name != 'Trashed') { %>
-                            <% let checked = false %>
-                            <% if (current_note !== null) { %>
-                                <% if (current_note.categories.includes(categories_list[i].name, 0)) { %>
-                                    <% checked = true %>
+                        <% for (let i = 0; i < categories_list.length; i++) { %>
+                            <% if (categories_list[i].name != 'Uncategorised' && categories_list[i].name != 'Trashed') { %>
+                                <% let checked = false %>
+                                <% if (current_note !== null) { %>
+                                    <% if (current_note.categories.includes(categories_list[i].name, 0)) { %>
+                                        <% checked = true %>
+                                    <% } %>
                                 <% } %>
-                            <% } %>
                     <li>
                         <input type="checkbox" <% if (checked) {%>checked<% } %>>
                         <label><%= categories_list[i].name %></label>
                     </li>
+                            <% } %>
                         <% } %>
-                    <% } %>
                 </ul>
                     <% } else { %>
                         <div class="empty-categories-list-tip">no custom categories</div>

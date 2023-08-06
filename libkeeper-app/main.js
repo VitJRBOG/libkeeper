@@ -81,6 +81,14 @@ function makeHandlers(app) {
         res.redirect(`/`)
     })
 
+    app.delete('/category', function (req, res) {
+        let category_id = req.query.id
+
+        deleteCategory(category_id)
+
+        res.redirect(`/`)
+    })
+
     app.get('/note', function (req, res) {
         data['categories_list'] = fetchCategoriesList()
         data['categories_list'] = _categoriesIconFinding(data['categories_list'])
@@ -227,6 +235,22 @@ function createCategory(category_name) {
         },
         body: str_params
     })
+
+    let result = {}
+    let body = res.getBody('utf-8')
+    if (body.length > 0) {
+        result = JSON.parse(body)
+    }
+
+    if (result.hasOwnProperty('error')) {
+        console.log(`error: ${result['error']}`)
+    }
+}
+
+function deleteCategory(category_id) {
+    let u = `http://${API_HOST}:${API_PORT}/category?` + new URLSearchParams({ category_id: category_id }).toString()
+
+    var res = syncrequest('DELETE', u)
 
     let result = {}
     let body = res.getBody('utf-8')

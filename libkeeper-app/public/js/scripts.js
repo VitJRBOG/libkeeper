@@ -59,6 +59,20 @@ function filterByCategory(category) {
     }
 }
 
+function deleteCategory(category_id, category_is_immutable) {
+    if (category_is_immutable == 1) {
+        console.error('unable to delete the immutable category')
+    } else {
+        fetch(`/category?id=${category_id}`, {
+            method: 'delete'
+        }).then(response => {
+            if (response.redirected) {
+                window.location.href = response.url
+            }
+        })
+    }
+}
+
 function openNewCanvas() {
     window.location.replace('/')
 }
