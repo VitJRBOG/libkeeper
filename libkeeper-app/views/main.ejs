@@ -138,6 +138,7 @@
 
             <div id="note-categories-list" class="note-categories-list" style="visibility: hidden;">
                 <% { %>
+                    <% if (categories_list.length > 2) { %>
                 <ul>
                     <% for (let i = 0; i < categories_list.length; i++) { %>
                         <% if (categories_list[i].name != 'Uncategorised' && categories_list[i].name != 'Trashed') { %>
@@ -154,6 +155,9 @@
                         <% } %>
                     <% } %>
                 </ul>
+                    <% } else { %>
+                        <div class="empty-categories-list-tip">no custom categories</div>
+                    <% } %>
                 <% } %>
             </div>
 
