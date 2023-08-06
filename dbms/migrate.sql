@@ -35,8 +35,8 @@ CREATE TABLE note_category (
     note_id INTEGER NOT NULL,
     category_id INTEGER NOT NULL,
     PRIMARY KEY(id),
-    CONSTRAINT fk_nc_note FOREIGN KEY(note_id) REFERENCES note(id),
-    CONSTRAINT fk_nc_category FOREIGN KEY(category_id) REFERENCES category(id)
+    CONSTRAINT fk_nc_note FOREIGN KEY(note_id) REFERENCES note(id) ON DELETE CASCADE,
+    CONSTRAINT fk_nc_category FOREIGN KEY(category_id) REFERENCES category(id) ON DELETE CASCADE
 );
 
 INSERT INTO category(name, immutable) VALUES
