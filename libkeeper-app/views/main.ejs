@@ -8,6 +8,17 @@
     </head>
 
     <body>
+        <% if (error !== null && error.length > 0) { %>
+        <div class="errors-list">
+            <% for (let i = 0; i < error.length; i++) { %>
+                <% let div_id = `error-message-${i}` %>
+            <div id="<%= div_id %>" class="error-message" style="visibility: visible;">
+                <button class="error-message-hide-btn" onclick="hideErrorBlock('<%= div_id %>')">x</button>
+                <div><%= error[i] %></div>
+            </div>
+            <% } %>
+        </div>
+        <% } %>
         <div class="categories-part">
             <div class="categories-toolbar">
                 <button class="toolbtn tooltip" onclick="toggleCategoryCreationPromptDisplay()">
@@ -38,12 +49,14 @@
                     <span class="tooltiptext">All</span>
                     <img src="/img/icons/category-all.png" class="category-button-icon" alt="All" />
                 </button>
-                <% for(let i = 0; i < categories_list.length; i++) { %>
-                    <% if (categories_list[i].name != 'Trashed') { %>
+                <% if (categories_list !== null) { %>
+                    <% for(let i = 0; i < categories_list.length; i++) { %>
+                        <% if (categories_list[i].name != 'Trashed') { %>
                     <button class="category-button tooltip" onclick="filterByCategory('<%= categories_list[i].name %>')">
                         <span class="tooltiptext"><%= categories_list[i].name %></span>
                         <img src="<%= categories_list[i].icon %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
                     </button>
+                        <% } %>
                     <% } %>
                 <% } %>
                 <button class="category-button tooltip" onclick="filterByCategory('Trashed')">
@@ -66,14 +79,15 @@
             </div>
 
             <div class="notes-list">
-                <% for(let i = 0; i < notes_list.length; i++) { %>
-                    <% let link = '/note' %>
-                    <% if (current_category !== null) { %>
-                        <% link += '?category=' + encodeURIComponent(current_category.name) + '&' %>
-                    <% } else { %>
-                        <% link += '?' %>
-                    <% } %>
-                    <% link += "id=" + notes_list[i].id %>
+                <% if (notes_list !== null) { %>
+                    <% for(let i = 0; i < notes_list.length; i++) { %>
+                        <% let link = '/note' %>
+                        <% if (current_category !== null) { %>
+                            <% link += '?category=' + encodeURIComponent(current_category.name) + '&' %>
+                        <% } else { %>
+                            <% link += '?' %>
+                        <% } %>
+                        <% link += "id=" + notes_list[i].id %>
                 <a href=<%= link %> class="note-link">
                     <div id="note_<%= notes_list[i].id %>" class="note-announce note-announce-regular">
                         <% if (notes_list[i].title == "") { %>
@@ -84,6 +98,7 @@
                         <p><%= notes_list[i].c_date %></p>
                     </div>
                 </a>
+                    <% } %>
                 <% } %>
             </div>
         </div>
@@ -138,7 +153,7 @@
 
             <div id="note-categories-list" class="note-categories-list" style="visibility: hidden;">
                 <% { %>
-                    <% if (categories_list.length > 2) { %>
+                    <% if (categories_list !== null && categories_list.length > 2) { %>
                 <ul>
                         <% for (let i = 0; i < categories_list.length; i++) { %>
                             <% if (categories_list[i].name != 'Uncategorised' && categories_list[i].name != 'Trashed') { %>

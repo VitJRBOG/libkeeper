@@ -20,6 +20,14 @@ function highlintVersion() {
     }
 }
 
+function hideErrorBlock(div_id) {
+    let tag = document.getElementById(div_id)
+
+    if (tag.style['visibility'] == 'visible') {
+        tag.style['visibility'] = 'hidden'
+    }
+}
+
 function toggleCategoryCreationPromptDisplay() {
     let tag = document.getElementById('category-creation-prompt')
 
@@ -202,10 +210,15 @@ function _formatDate(now, tz) {
 }
 
 function _getCategories() {
-    let checkboxes = document.getElementById('note-categories-list').getElementsByTagName('ul')[0].getElementsByTagName('li')
+    let categories_list = document.getElementById('note-categories-list').getElementsByTagName('ul')
+    console.log(categories_list)
+    if (categories_list.length == 0) {
+        return []
+    }
+
+    let checkboxes = categories_list[0].getElementsByTagName('li')
 
     let categories = []
-
     for (let i = 0; i < checkboxes.length; i++) {
         console.log(checkboxes[i])
         if (checkboxes[i].getElementsByTagName('input')[0].checked) {

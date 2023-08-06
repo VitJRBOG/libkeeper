@@ -3,6 +3,7 @@ const ejs = require('ejs')
 const syncrequest = require('sync-request')
 const crypto = require('crypto')
 const fs = require('fs')
+const { error } = require('console')
 
 const PUBLIC_DIR = String(process.env.PUBLIC_DIR)
 const VIEWS_DIR = String(process.env.VIEWS_DIR)
@@ -37,6 +38,7 @@ function makeServerApp() {
 
 function makeHandlers(app) {
     var data = {
+        'error': null,
         'categories_list': null,
         'notes_list': null,
         'note_versions': null,
@@ -46,28 +48,46 @@ function makeHandlers(app) {
     }
 
     app.get('/', function (req, res) {
+        data['error'] = []
         data['categories_list'] = null
         data['current_category'] = null
         data['current_note'] = null
         data['current_version'] = null
         data['note_versions'] = null
 
-        data['categories_list'] = fetchCategoriesList()
-        data['categories_list'] = _categoriesIconFinding(data['categories_list'])
+        let result = fetchCategoriesList()
+        if (typeof result == 'string') {
+            data['error'].push(result)
+        } else {
+            data['categories_list'] = result
+        }
 
-        data['notes_list'] = fetchNotesList()
+        if (data['categories_list'] !== null) {
+            data['categories_list'] = _categoriesIconFinding(data['categories_list'])
+        }
+
+        result = fetchNotesList()
+        if (typeof result == 'string') {
+            data['error'].push(result)
+        } else {
+            data['notes_list'] = result
+        }
 
         if (typeof req.query.category !== 'undefined') {
             let selectedCategory = decodeURIComponent(req.query.category)
-            for (let i = 0; i < data['categories_list'].length; i++) {
-                if (data['categories_list'][i].name === selectedCategory) {
-                    data['current_category'] = data['categories_list'][i]
+            if (data['categories_list'] !== null) {
+                for (let i = 0; i < data['categories_list'].length; i++) {
+                    if (data['categories_list'][i].name === selectedCategory) {
+                        data['current_category'] = data['categories_list'][i]
+                    }
                 }
             }
-            for (let i = 0; i < data['notes_list'].length; i++) {
-                if (!data['notes_list'][i].categories.includes(data['current_category'].name)) {
-                    data['notes_list'].splice(i, 1)
-                    i--
+            if (data['notes_list'] !== null) {
+                for (let i = 0; i < data['notes_list'].length; i++) {
+                    if (!data['notes_list'][i].categories.includes(data['current_category'].name)) {
+                        data['notes_list'].splice(i, 1)
+                        i--
+                    }
                 }
             }
         }
@@ -90,42 +110,72 @@ function makeHandlers(app) {
     })
 
     app.get('/note', function (req, res) {
-        data['categories_list'] = fetchCategoriesList()
-        data['categories_list'] = _categoriesIconFinding(data['categories_list'])
+        data['error'] = null
 
-        data['notes_list'] = fetchNotesList()
+        let result = fetchCategoriesList()
+        if (typeof result == 'string') {
+            data['error'].push(result)
+        } else {
+            data['categories_list'] = result
+        }
+
+        if (data['categories_list'] !== null) {
+            data['categories_list'] = _categoriesIconFinding(data['categories_list'])
+        }
+
+        result = fetchNotesList()
+        if (typeof result == 'string') {
+            data['error'].push(result)
+        } else {
+            data['notes_list'] = result
+        }
 
         if (typeof req.query.category !== 'undefined') {
             let selectedCategory = decodeURIComponent(req.query.category)
-            for (let i = 0; i < data['categories_list'].length; i++) {
-                if (data['categories_list'][i].name === selectedCategory) {
-                    data['current_category'] = data['categories_list'][i]
+            if (data['categories_list'] !== null) {
+                for (let i = 0; i < data['categories_list'].length; i++) {
+                    if (data['categories_list'][i].name === selectedCategory) {
+                        data['current_category'] = data['categories_list'][i]
+                    }
                 }
             }
+            if (data['notes_list'] !== null) {
+                for (let i = 0; i < data['notes_list'].length; i++) {
+                    if (!data['notes_list'][i].categories.includes(data['current_category'].name)) {
+                        data['notes_list'].splice(i, 1)
+                        i--
+                    }
+                }
+            }
+        }
+
+        if (data['notes_list'] !== null) {
             for (let i = 0; i < data['notes_list'].length; i++) {
-                if (!data['notes_list'][i].categories.includes(data['current_category'].name)) {
-                    data['notes_list'].splice(i, 1)
-                    i--
+                if (data['notes_list'][i].id == req.query.id) {
+                    data['current_note'] = data['notes_list'][i]
                 }
             }
         }
 
-        for (let i = 0; i < data['notes_list'].length; i++) {
-            if (data['notes_list'][i].id == req.query.id) {
-                data['current_note'] = data['notes_list'][i]
-            }
+        result = fetchNoteVersions(req.query.id)
+        if (typeof result == 'string') {
+            data['error'].push(result)
+        } else {
+            data['note_versions'] = result
         }
-
-        data['note_versions'] = fetchNoteVersions(req.query.id)
 
         if (req.query.version_id) {
-            for (let i = 0; i < data['note_versions'].length; i++) {
-                if (data['note_versions'][i].id == req.query.version_id) {
-                    data['current_version'] = data['note_versions'][i]
+            if (data['note_versions'] !== null) {
+                for (let i = 0; i < data['note_versions'].length; i++) {
+                    if (data['note_versions'][i].id == req.query.version_id) {
+                        data['current_version'] = data['note_versions'][i]
+                    }
                 }
             }
         } else {
-            data['current_version'] = data['note_versions'][0]
+            if (data['note_versions'] !== null) {
+                data['current_version'] = data['note_versions'][0]
+            }
         }
 
         res.render('main', data)
@@ -196,20 +246,26 @@ function makeHandlers(app) {
 }
 
 function fetchCategoriesList() {
-    let u = `http://${API_HOST}:${API_PORT}/categories`
+    try {
+        let u = `http://${API_HOST}:${API_PORT}/categories`
 
-    var res = syncrequest('GET', u)
+        var res = syncrequest('GET', u)
 
-    let result = JSON.parse(res.getBody('utf-8'))
+        let values = JSON.parse(res.getBody('utf-8'))
 
-    let categories_list = null
-    if (result.hasOwnProperty('response')) {
-        categories_list = result['response']
-    } else if (result.hasOwnProperty('error')) {
-        console.log(`error: ${result['error']}`)
+        let result = null
+        if (values.hasOwnProperty('response')) {
+            result = values['response']
+        } else if (values.hasOwnProperty('error')) {
+            result = values['error']
+        }
+
+        return result
+
+    } catch (err) {
+        error(err)
+        return 'Unable to fetch categories list from server.'
     }
-
-    return categories_list
 }
 
 function _categoriesIconFinding(categories_list) {
@@ -264,24 +320,30 @@ function deleteCategory(category_id) {
 }
 
 function fetchNotesList() {
-    let u = `http://${API_HOST}:${API_PORT}/notes`
+    try {
+        let u = `http://${API_HOST}:${API_PORT}/notes`
 
-    var res = syncrequest('GET', u)
+        var res = syncrequest('GET', u)
 
-    let result = JSON.parse(res.getBody('utf-8'))
+        let values = JSON.parse(res.getBody('utf-8'))
 
-    let notes_list = null
-    if (result.hasOwnProperty('response')) {
-        notes_list = result['response']
-    } else if (result.hasOwnProperty('error')) {
-        console.log(`error: ${result['error']}`)
+        let result = null
+        if (values.hasOwnProperty('response')) {
+            let notes_list = values['response']
+            for (let i = 0; i < notes_list.length; i++) {
+                notes_list[i]['c_date'] = _formatDate(notes_list[i]['c_date'])
+            }
+            result = notes_list
+        } else if (values.hasOwnProperty('error')) {
+            result = values['error']
+        }
+
+        return result
+
+    } catch (err) {
+        error(err)
+        return 'Unable to fetch notes list from server.'
     }
-
-    for (let i = 0; i < notes_list.length; i++) {
-        notes_list[i]['c_date'] = _formatDate(notes_list[i]['c_date'])
-    }
-
-    return notes_list
 }
 
 function _formatDate(strUnixTS) {
@@ -329,25 +391,30 @@ function _formatDate(strUnixTS) {
 }
 
 function fetchNoteVersions(note_id) {
-    let u = `http://${API_HOST}:${API_PORT}/note?` + new URLSearchParams({ note_id: note_id }).toString()
+    try {
+        let u = `http://${API_HOST}:${API_PORT}/note?` + new URLSearchParams({ note_id: note_id }).toString()
 
-    var res = syncrequest('GET', u)
+        var res = syncrequest('GET', u)
 
-    let result = JSON.parse(res.getBody('utf-8'))
+        let values = JSON.parse(res.getBody('utf-8'))
 
-    let note_versions = null
+        let result = null
+        if (values.hasOwnProperty('response')) {
+            note_versions = values['response']
+            for (let i = 0; i < note_versions.length; i++) {
+                note_versions[i]['c_date'] = _formatDate(note_versions[i]['c_date'])
+            }
+            result = note_versions
+        } else if (result.hasOwnProperty('error')) {
+            result = values['error']
+        }
 
-    if (result.hasOwnProperty('response')) {
-        note_versions = result['response']
-    } else if (result.hasOwnProperty('error')) {
-        console.log(`error: ${result['error']}`)
+        return result
     }
-
-    for (let i = 0; i < note_versions.length; i++) {
-        note_versions[i]['c_date'] = _formatDate(note_versions[i]['c_date'])
+    catch (err) {
+        error(err)
+        return 'Unable to fetch versions list from server.'
     }
-
-    return note_versions
 }
 
 function createNewNote(values) {
