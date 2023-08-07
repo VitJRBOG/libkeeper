@@ -72,10 +72,16 @@
                     <span class="tooltiptext">New Note</span>
                     <img src="/img/icons/new-note.png" class="toolicon" alt="New Note" />
                 </button>
-                <button class="toolbtn tooltip" onclick="deleteNote()">
+                <% { %>
+                    <% let need_to_disable = false %>
+                    <% if (current_note === null) { %>
+                        <% need_to_disable = true %>
+                    <% } %>
+                <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } else { %> onclick="deleteNote()"<% } %>>
                     <span class="tooltiptext">Delete Note</span>
                     <img src="/img/icons/del-note.png" class="toolicon" alt="Delete Note" />
                 </button>
+                <% } %>
             </div>
 
             <div class="notes-list">
