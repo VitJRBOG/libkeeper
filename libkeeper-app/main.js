@@ -273,7 +273,7 @@ function _categoriesIconFinding(categories_list) {
         if (fs.existsSync(`${PUBLIC_DIR}/img/icons/category-${categories_list[i]['name']}.png`)) {
             categories_list[i]['icon'] = `/img/icons/category-${categories_list[i]['name']}.png`
         } else {
-            categories_list[i]['icon'] = `/img/icons/category-uncategorised.png`
+            categories_list[i]['icon'] = `/img/icons/category-noicon.png`
         }
     }
 
