@@ -6,10 +6,20 @@ DROP TABLE IF EXISTS note;
 
 DROP TABLE IF EXISTS category;
 
+DROP TABLE IF EXISTS icon;
+
+CREATE TABLE icon (
+    id SERIAL NOT NULL UNIQUE,
+    type TEXT NOT NULL,
+    path TEXT NOT NULL UNIQUE,
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE category (
     id SERIAL NOT NULL UNIQUE,
     name TEXT NOT NULL UNIQUE,
     immutable INTEGER NOT NULL DEFAULT 0,
+    icon_id INTEGER,
     PRIMARY KEY(id)
 );
 
@@ -39,5 +49,13 @@ CREATE TABLE note_category (
     CONSTRAINT fk_nc_category FOREIGN KEY(category_id) REFERENCES category(id) ON DELETE CASCADE
 );
 
-INSERT INTO category(name, immutable) VALUES
-    ('Uncategorised', 1), ('Trashed', 1);
+INSERT INTO icon(type, path) VALUES
+    ('category', 'noicon.png'),
+    ('category', 'all.png'),
+    ('category', 'uncategorised.png'),
+    ('category', 'trashed.png'),
+    ('category', 'todo.png');
+
+INSERT INTO category(name, immutable, icon_id) VALUES
+    ('Uncategorised', 1, (SELECT id FROM icon WHERE path LIKE 'uncategorised%')),
+    ('Trashed', 1, (SELECT id FROM icon WHERE path LIKE 'trashed%'));

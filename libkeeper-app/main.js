@@ -50,6 +50,7 @@ function makeHandlers(app) {
     app.get('/', function (req, res) {
         data['error'] = []
         data['categories_list'] = null
+        data['icons_list'] = null
         data['current_category'] = null
         data['current_note'] = null
         data['current_version'] = null
@@ -62,8 +63,15 @@ function makeHandlers(app) {
             data['categories_list'] = result
         }
 
-        if (data['categories_list'] !== null) {
-            data['categories_list'] = _categoriesIconFinding(data['categories_list'])
+        result = fetchIconsList()
+        if (typeof result == 'string') {
+            data['error'].push(result)
+        } else {
+            data['icons_list'] = result
+        }
+
+        if (data['categories_list'] !== null && data['icons_list'] !== null) {
+            data['categories_list'] = _categoriesIconFinding(data['categories_list'], data['icons_list'])
         }
 
         result = fetchNotesList()
@@ -96,7 +104,12 @@ function makeHandlers(app) {
     })
 
     app.post('/category', function (req, res) {
-        createCategory(req.body.category_name)
+        let values = {
+            name: req.body.name,
+            icon_id: req.body.icon_id
+        }
+
+        createCategory(values)
 
         res.redirect(`/`)
     })
@@ -119,8 +132,15 @@ function makeHandlers(app) {
             data['categories_list'] = result
         }
 
-        if (data['categories_list'] !== null) {
-            data['categories_list'] = _categoriesIconFinding(data['categories_list'])
+        result = fetchIconsList()
+        if (typeof result == 'string') {
+            data['error'].push(result)
+        } else {
+            data['icons_list'] = result
+        }
+
+        if (data['categories_list'] !== null && data['icons_list'] !== null) {
+            data['categories_list'] = _categoriesIconFinding(data['categories_list'], data['icons_list'])
         }
 
         result = fetchNotesList()
@@ -268,22 +288,54 @@ function fetchCategoriesList() {
     }
 }
 
-function _categoriesIconFinding(categories_list) {
+function fetchIconsList() {
+    try {
+        let u = `http://${API_HOST}:${API_PORT}/icons`
+
+        var res = syncrequest('GET', u)
+
+        let values = JSON.parse(res.getBody('utf-8'))
+
+        let result = null
+        if (values.hasOwnProperty('response')) {
+            result = values['response']
+        } else if (values.hasOwnProperty('error')) {
+            result = values['error']
+        }
+
+        return result
+
+    } catch (err) {
+        error(err)
+        return 'Unable to fetch icons list from server.'
+    }
+}
+
+function _categoriesIconFinding(categories_list, icons_list) {
     for (let i = 0; i < categories_list.length; i++) {
-        if (fs.existsSync(`${PUBLIC_DIR}/img/icons/category-${categories_list[i]['name']}.png`)) {
-            categories_list[i]['icon'] = `/img/icons/category-${categories_list[i]['name']}.png`
-        } else {
-            categories_list[i]['icon'] = `/img/icons/category-noicon.png`
+        for (let j = 0; j < icons_list.length; j++) {
+            if (categories_list[i].icon_id == icons_list[j].id) {
+                categories_list[i]['icon'] = icons_list[j].path
+            }
         }
     }
 
     return categories_list
 }
 
-function createCategory(category_name) {
+function createCategory(values) {
     let u = `http://${API_HOST}:${API_PORT}/category`
 
-    let str_params = `name=${encodeURIComponent(category_name)}`
+    let str_params = ''
+
+    let keys = Object.keys(values)
+
+    for (let i = 0; i < keys.length; i++) {
+        str_params += `${keys[i]}=${encodeURIComponent(values[keys[i]])}`
+        if (i < keys.length - 1) {
+            str_params += '&'
+        }
+    }
 
     var res = syncrequest('POST', u, {
         headers: {

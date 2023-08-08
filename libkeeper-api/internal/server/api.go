@@ -31,6 +31,22 @@ func handling(dbConn db.Connection) {
 		}
 	})
 
+	http.HandleFunc("/icons", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			icons, err := getIcons(dbConn)
+			if err != nil {
+				sendError(w, err)
+				return
+			}
+
+			sendData(w, http.StatusOK, icons)
+		default:
+			sendError(w, Error{http.StatusMethodNotAllowed, "method not allowed"})
+			return
+		}
+	})
+
 	http.HandleFunc("/category", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
@@ -234,19 +250,63 @@ func parseRequestParams(r *http.Request) error {
 	return nil
 }
 
+func getIcons(dbConn db.Connection) ([]models.Icon, error) {
+	icons, err := db.SelectIcons(dbConn)
+	if err != nil {
+		log.Printf("unable fetch icons from the database: %s", err)
+		return nil, Error{
+			http.StatusInternalServerError,
+			"unable fetch icons from the database",
+		}
+	}
+
+	return icons, nil
+}
+
 func createCategory(dbConn db.Connection, r *http.Request) error {
+	emptyParam := []string{}
+	someIsEmpty := false
+
 	if r.PostFormValue("name") == "" {
+		someIsEmpty = true
+		emptyParam = append(emptyParam, "name")
+	}
+
+	if r.PostFormValue("icon_id") == "" {
+		someIsEmpty = true
+		emptyParam = append(emptyParam, "icon_id")
+	}
+
+	if someIsEmpty {
+		errMsg := "some request parameters are missing: "
+
+		for i := range emptyParam {
+			if i > 0 && i < len(emptyParam) {
+				errMsg += ", "
+			}
+			errMsg += fmt.Sprintf("'%s'", emptyParam[i])
+		}
+
 		return Error{
 			http.StatusBadRequest,
-			"the 'name' parameter is empty",
+			errMsg,
+		}
+	}
+
+	iconID, err := strconv.Atoi(r.PostFormValue("icon_id"))
+	if err != nil {
+		return Error{
+			http.StatusBadRequest,
+			"the 'icon_id' parameter must be an integer",
 		}
 	}
 
 	category := models.Category{
-		Name: r.PostFormValue("name"),
+		Name:   r.PostFormValue("name"),
+		IconID: iconID,
 	}
 
-	err := db.CreateCategory(dbConn, category)
+	err = db.CreateCategory(dbConn, category)
 	if err != nil {
 		log.Printf("failed to create the category: %s", err)
 		return Error{
@@ -285,6 +345,11 @@ func updateCategory(dbConn db.Connection, r *http.Request) error {
 		emptyParam = append(emptyParam, "name")
 	}
 
+	if r.PostFormValue("icon_id") == "" {
+		someIsEmpty = true
+		emptyParam = append(emptyParam, "icon_id")
+	}
+
 	if someIsEmpty {
 		errMsg := "some request parameters are missing: "
 
@@ -309,9 +374,18 @@ func updateCategory(dbConn db.Connection, r *http.Request) error {
 		}
 	}
 
+	iconID, err := strconv.Atoi(r.FormValue("icon_id"))
+	if err != nil {
+		return Error{
+			http.StatusBadRequest,
+			"the 'icon_id' parameter must be an integer",
+		}
+	}
+
 	category := models.Category{
-		ID:   categoryID,
-		Name: r.PostFormValue("name"),
+		ID:     categoryID,
+		Name:   r.PostFormValue("name"),
+		IconID: iconID,
 	}
 
 	err = db.UpdateCategory(dbConn, category)

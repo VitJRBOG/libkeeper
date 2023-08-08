@@ -118,6 +118,55 @@ body {
     border-radius: 5px;
 }
 
+.category-icons-list-prompt {
+    position: absolute;
+    margin: 2px 0 0 -1.5px;
+    padding: 5px 0 0 5px;
+    width: 320px;
+    text-align: left;
+    background-color: #fff;
+    border-style: solid;
+    border-color: #000;
+    border-width: 1px;
+    border-radius: 5px;
+}
+
+.category-icon-button {
+    float: left;
+    margin: 0 5px 5px 0;
+    padding: 6px 0 2px 0;
+    height: 65px;
+    width: 73px;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: black;
+}
+
+.category-icons-list-prompt label {
+    float: left;
+}
+
+.category-icons-list-prompt input[type="radio"] {
+    position: absolute;
+    display: none;
+    padding: 0;
+    margin: 0 0 0 -50px;
+}
+
+input[type="radio"]:hover+.category-icon-button {
+    cursor: pointer;
+    background-color:#D0D0D0;
+}
+
+input[type="radio"]:checked+.category-icon-button {
+    background-color: #b7b7b7;
+}
+
+input[type="radio"]:checked:hover+.category-icon-button {
+    background-color:#D0D0D0;
+}
+
 .category-button {
     margin-bottom: 7px;
     padding: 0;
@@ -135,7 +184,8 @@ body {
 }
 
 .category-button-icon {
-    margin: auto;
+    margin: 0 0 0 6.5px;
+    padding: 5px 0 0 0;
     display: block;
     padding: 0;
     height: 60px;

@@ -8,6 +8,9 @@
     </head>
 
     <body>
+    <% { %>
+        <% let toolbtns_icon_path = '/img/icons/toolbuttons/' %>
+        <% let categorybtns_icon_path = '/img/icons/categories/' %>
         <% if (error !== null && error.length > 0) { %>
         <div class="errors-list">
             <% for (let i = 0; i < error.length; i++) { %>
@@ -23,7 +26,7 @@
             <div class="categories-toolbar">
                 <button class="toolbtn tooltip" onclick="toggleCategoryCreationPromptDisplay()">
                     <span class="tooltiptext">Add category</span>
-                    <img src="/img/icons/add-folder.png" class="toolicon" alt="Add Folder" />
+                    <img src="<%= toolbtns_icon_path + 'add-folder.png'%>" class="toolicon" alt="Add Folder" />
                 </button>
                 <% { %>
                     <% let need_to_disable = false %>
@@ -32,36 +35,53 @@
                     <% } %>
                 <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } else { %> onclick="deleteCategory('<%= current_category.id %>', '<%= current_category.immutable %>')"<% } %>>
                     <span class="tooltiptext">Delete category</span>
-                    <img src="/img/icons/del-folder.png" class="toolicon" alt="Delete Folder" />
+                    <img src="<%= toolbtns_icon_path + 'del-folder.png'%>" class="toolicon" alt="Delete Folder" />
                 </button>
                 <% } %>
             </div>
 
             <div id="category-creation-prompt" class="category-creation-prompt" style="visibility: hidden;">
-                <form action="/category" method="post">
-                    <input type="text" name="category_name" placeholder="Enter a category name...">
-                    <button type="submit">Create</button>
-                </form>
+                <div>
+                    <input type="text" id="category-name-textfield" placeholder="Enter a category name...">
+                    <button onclick="toggleCaregoryIconsListPromptDisplay()">Icon</button>
+                    <button onclick="createCategory()">Create</button>
+                </div>
+                <div id="category-icons-list-prompt" class="category-icons-list-prompt" style="visibility: hidden;">
+                    <% if (icons_list !== null) { %>
+                        <% let is_checked = true %>
+                        <% for(let i = 0; i < icons_list.length; i++) { %>
+                            <% if (is_checked && i != 0) { %>
+                                <% is_checked = false %>
+                            <% } %>
+                    <label>
+                        <input type="radio" name="category-icon-buttons" value="<%= icons_list[i].id %>"<% if (is_checked) { %> checked="checked"<% } %>>
+                        <div class="category-icon-button">
+                            <img src="<%= `${categorybtns_icon_path}${icons_list[i].path}` %>" class="category-button-icon">
+                        </div>
+                    </label>
+                        <% } %>
+                    <% } %>
+                </div>
             </div>
 
             <div class="categories-list">
                 <button class="category-button tooltip" onclick="filterByCategory('All')">
                     <span class="tooltiptext">All</span>
-                    <img src="/img/icons/category-all.png" class="category-button-icon" alt="All" />
+                    <img src="<%= `${categorybtns_icon_path}/all.png` %>" class="category-button-icon" alt="All" />
                 </button>
                 <% if (categories_list !== null) { %>
                     <% for(let i = 0; i < categories_list.length; i++) { %>
                         <% if (categories_list[i].name != 'Trashed') { %>
                     <button class="category-button tooltip" onclick="filterByCategory('<%= categories_list[i].name %>')">
                         <span class="tooltiptext"><%= categories_list[i].name %></span>
-                        <img src="<%= categories_list[i].icon %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
+                        <img src="<%= `${categorybtns_icon_path}${categories_list[i].icon}` %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
                     </button>
                         <% } %>
                     <% } %>
                 <% } %>
                 <button class="category-button tooltip" onclick="filterByCategory('Trashed')">
                     <span class="tooltiptext">Trashed</span>
-                    <img src="/img/icons/category-trashed.png" class="category-button-icon" alt="All" />
+                    <img src="<%= `${categorybtns_icon_path}/trashed.png` %>" class="category-button-icon" alt="Trashed" />
                 </button>
             </div>
         </div>
@@ -70,7 +90,7 @@
             <div class="notes-toolbar">
                 <button class="toolbtn tooltip" onclick="openNewCanvas()">
                     <span class="tooltiptext">New Note</span>
-                    <img src="/img/icons/new-note.png" class="toolicon" alt="New Note" />
+                    <img src="<%= toolbtns_icon_path + 'new-note.png'%>" class="toolicon" alt="New Note" />
                 </button>
                 <% { %>
                     <% let need_to_disable = false %>
@@ -79,7 +99,7 @@
                     <% } %>
                 <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } else { %> onclick="deleteNote()"<% } %>>
                     <span class="tooltiptext">Delete Note</span>
-                    <img src="/img/icons/del-note.png" class="toolicon" alt="Delete Note" />
+                    <img src="<%= toolbtns_icon_path + 'del-note.png'%>" class="toolicon" alt="Delete Note" />
                 </button>
                 <% } %>
             </div>
@@ -113,26 +133,26 @@
             <div class="canvas-toolbar">
                 <button class="toolbtn tooltip" onclick="handleTheNote(document.getElementById('full_text').value)">
                     <span class="tooltiptext">Save Note</span>
-                    <img src="/img/icons/save-note.png" class="toolicon" alt="Save Note" /></button>
+                    <img src="<%= toolbtns_icon_path + 'save-note.png'%>" class="toolicon" alt="Save Note" /></button>
                 <button class="toolbtn tooltip" onclick="toggleVersionsListDisplay()">
                     <span class="tooltiptext">History</span>
-                    <img src="/img/icons/note-history.png" class="toolicon" alt="History" />
+                    <img src="<%= toolbtns_icon_path + 'note-history.png'%>" class="toolicon" alt="History" />
                 </button>
                 <button class="toolbtn tooltip">
                     <span class="tooltiptext">Undo</span>
-                    <img src="/img/icons/undo.png" class="toolicon" alt="Undo" />
+                    <img src="<%= toolbtns_icon_path + 'undo.png'%>" class="toolicon" alt="Undo" />
                 </button>
                 <button class="toolbtn tooltip">
                     <span class="tooltiptext">Redo</span>
-                    <img src="/img/icons/redo.png" class="toolicon" alt="Redo" />
+                    <img src="<%= toolbtns_icon_path + 'redo.png'%>" class="toolicon" alt="Redo" />
                 </button>
                 <button class="toolbtn tooltip">
                     <span class="tooltiptext">Styles</span>
-                    <img src="/img/icons/styles.png" class="toolicon" alt="Styles" />
+                    <img src="<%= toolbtns_icon_path + 'styles.png'%>" class="toolicon" alt="Styles" />
                 </button>
                 <button class="toolbtn tooltip" onclick="toggleCategoriesListDisplay()">
                     <span class="tooltiptext">Categories</span>
-                    <img src="/img/icons/select-folder.png" class="toolicon" alt="Categories" />
+                    <img src="<%= toolbtns_icon_path + 'select-folder.png'%>" class="toolicon" alt="Categories" />
                 </button>
             </div>
 
@@ -196,5 +216,6 @@
         <script type="text/javascript" src="/js/scripts.js"></script>
         <script type="text/javascript">highlintNote()</script>
         <script type="text/javascript">highlintVersion()</script>
+    <% } %>
     </body>
 </html>

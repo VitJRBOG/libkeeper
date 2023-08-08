@@ -30,6 +30,21 @@ function hideErrorBlock(div_id) {
 
 function toggleCategoryCreationPromptDisplay() {
     let tag = document.getElementById('category-creation-prompt')
+    let tagIconsList = document.getElementById('category-icons-list-prompt')
+
+    if (tag.style['visibility'] == 'hidden') {
+        tag.style['visibility'] = 'visible'
+    } else if (tag.style['visibility'] == 'visible') {
+        tag.style['visibility'] = 'hidden'
+    }
+
+    if (tagIconsList.style['visibility'] == 'visible') {
+        tagIconsList.style['visibility'] = 'hidden'
+    }
+}
+
+function toggleCaregoryIconsListPromptDisplay() {
+    let tag = document.getElementById('category-icons-list-prompt')
 
     if (tag.style['visibility'] == 'hidden') {
         tag.style['visibility'] = 'visible'
@@ -65,6 +80,35 @@ function filterByCategory(category) {
         let newLocation = `/?category=${encodeURIComponent(category)}`
         window.location.replace(newLocation)
     }
+}
+
+function createCategory() {
+    let name = document.getElementById('category-name-textfield').value
+    let icon_id = ''
+
+    let radioBtns = document.getElementsByName('category-icon-buttons')
+
+    for (let i = 0; i < radioBtns.length; i++) {
+        if (radioBtns[i].checked) {
+            icon_id = radioBtns[i].value
+        }
+    }
+
+    fetch('/category', {
+        method: 'POST',
+        body: JSON.stringify({
+            name: name,
+            icon_id: icon_id,
+        }),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (response.redirected) {
+            window.location.href = response.url
+        }
+    })
 }
 
 function deleteCategory(category_id, category_is_immutable) {

@@ -30,11 +30,36 @@ func NewConnection(dsn string) (Connection, error) {
 	}, nil
 }
 
+// SelectIcons selects entries from the "icon" table.
+func SelectIcons(dbConn Connection) ([]models.Icon, error) {
+	query := "SELECT * FROM icon"
+
+	rows, err := dbConn.Conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select entries from the 'icon' table: %s", err)
+	}
+
+	icons := []models.Icon{}
+
+	for rows.Next() {
+		icon := models.Icon{}
+
+		err := rows.Scan(&icon.ID, &icon.Type, &icon.Path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan rows from the 'icon' table: %s", err)
+		}
+
+		icons = append(icons, icon)
+	}
+
+	return icons, nil
+}
+
 // CreateCategory inserts new entry into the "category" table.
 func CreateCategory(dbConn Connection, category models.Category) error {
-	query := "INSERT INTO category(name) VALUES($1)"
+	query := "INSERT INTO category(name, icon_id) VALUES($1, $2)"
 
-	_, err := dbConn.Conn.Exec(query, category.Name)
+	_, err := dbConn.Conn.Exec(query, category.Name, category.IconID)
 	if err != nil {
 		return fmt.Errorf("failed to insert entries into the 'category' table: %s", err)
 	}
@@ -56,7 +81,7 @@ func SelectCategories(dbConn Connection) ([]models.Category, error) {
 	for rows.Next() {
 		category := models.Category{}
 
-		err := rows.Scan(&category.ID, &category.Name, &category.Immutable)
+		err := rows.Scan(&category.ID, &category.Name, &category.Immutable, &category.IconID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan rows from the 'category' table: %s", err)
 		}
@@ -69,9 +94,9 @@ func SelectCategories(dbConn Connection) ([]models.Category, error) {
 
 // UpdateCategory updates an existing entry in the 'category' table.
 func UpdateCategory(dbConn Connection, category models.Category) error {
-	query := "UPDATE category SET name = $1 WHERE id = $2 AND immutable = '0'"
+	query := "UPDATE category SET name = $1, icon_id = $2 WHERE id = $3 AND immutable = '0'"
 
-	_, err := dbConn.Conn.Exec(query, category.Name, category.ID)
+	_, err := dbConn.Conn.Exec(query, category.Name, category.IconID, category.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update the 'category' table entry: %s", err)
 	}
