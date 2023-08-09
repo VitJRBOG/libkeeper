@@ -114,7 +114,7 @@
                     <% for(let i = 0; i < notes_list.length; i++) { %>
                         <% let link = '/note' %>
                         <% if (current_category !== null) { %>
-                            <% link += '?category=' + encodeURIComponent(current_category.name) + '&' %>
+                            <% link += '?category=' + encodeURIComponent(current_category.id) + '&' %>
                         <% } else { %>
                             <% link += '?' %>
                         <% } %>
