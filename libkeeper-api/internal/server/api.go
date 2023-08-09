@@ -541,24 +541,58 @@ func getVersions(dbConn db.Connection, r *http.Request) ([]models.Version, error
 
 func updateNote(dbConn db.Connection, r *http.Request) error {
 	emptyParam := []string{}
-	someIsEmpty := false
+	categoriesUpdateFail := false
+	fullUpdateFail := false
 
 	if r.PostFormValue("note_id") == "" {
-		someIsEmpty = true
-		emptyParam = append(emptyParam, "note_id")
+		return Error{
+			http.StatusBadRequest,
+			"'note_id' parameter are missing",
+		}
+	}
+
+	noteID, err := strconv.Atoi(r.PostFormValue("note_id"))
+	if err != nil {
+		return Error{
+			http.StatusBadRequest,
+			"the 'note_id' parameter must be an integer",
+		}
+	}
+
+	note := models.Note{
+		ID: noteID,
+	}
+
+	if r.PostFormValue("categories") != "" {
+		note.Categories = strings.Split(r.PostFormValue("categories"), ",")
+
+		err := db.UpdateNoteCategories(dbConn, note)
+		if err != nil {
+			log.Printf("failed to update note categories: %s", err)
+			return Error{
+				http.StatusInternalServerError,
+				"failed to update note categories",
+			}
+		}
+	} else {
+		categoriesUpdateFail = true
 	}
 
 	if r.PostFormValue("c_date") == "" {
-		someIsEmpty = true
+		fullUpdateFail = true
 		emptyParam = append(emptyParam, "c_date")
 	}
 
 	if r.PostFormValue("checksum") == "" {
-		someIsEmpty = true
+		fullUpdateFail = true
 		emptyParam = append(emptyParam, "checksum")
 	}
 
-	if someIsEmpty {
+	if fullUpdateFail {
+		if !categoriesUpdateFail {
+			return nil
+		}
+
 		errMsg := "some request parameters are missing: "
 
 		for i := range emptyParam {
@@ -568,17 +602,13 @@ func updateNote(dbConn db.Connection, r *http.Request) error {
 			errMsg += fmt.Sprintf("'%s'", emptyParam[i])
 		}
 
+		if categoriesUpdateFail {
+			errMsg += " (full note update) and 'categories' (note categories update)"
+		}
+
 		return Error{
 			http.StatusBadRequest,
 			errMsg,
-		}
-	}
-
-	noteID, err := strconv.Atoi(r.PostFormValue("note_id"))
-	if err != nil {
-		return Error{
-			http.StatusBadRequest,
-			"the 'note_id' parameter must be an integer",
 		}
 	}
 
@@ -591,10 +621,7 @@ func updateNote(dbConn db.Connection, r *http.Request) error {
 	}
 	cDate := strconv.FormatInt(creationDate.Unix(), 10)
 
-	note := models.Note{
-		ID:    noteID,
-		Title: r.PostFormValue("title"),
-	}
+	note.Title = r.PostFormValue("title")
 
 	version := models.Version{
 		FullText:     r.PostFormValue("full_text"),
@@ -609,19 +636,6 @@ func updateNote(dbConn db.Connection, r *http.Request) error {
 		return Error{
 			http.StatusInternalServerError,
 			"failed to update a note",
-		}
-	}
-
-	if r.PostFormValue("categories") != "" {
-		note.Categories = strings.Split(r.PostFormValue("categories"), ",")
-
-		err = db.UpdateNoteCategories(dbConn, note)
-		if err != nil {
-			log.Printf("failed to update note categories: %s", err)
-			return Error{
-				http.StatusInternalServerError,
-				"failed to update note categories",
-			}
 		}
 	}
 
