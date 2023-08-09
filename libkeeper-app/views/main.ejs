@@ -65,24 +65,29 @@
             </div>
 
             <div class="categories-list">
-                <button class="category-button tooltip" onclick="filterByCategory('All')">
+                <% { %>
+                    <% let trashedCategoryID = -1 %>
+                <button id="category-all" class="category-button category-button-regular tooltip" onclick="filterByCategory(-1)">
                     <span class="tooltiptext">All</span>
                     <img src="<%= `${categorybtns_icon_path}/all.png` %>" class="category-button-icon" alt="All" />
                 </button>
-                <% if (categories_list !== null) { %>
-                    <% for(let i = 0; i < categories_list.length; i++) { %>
-                        <% if (categories_list[i].name != 'Trashed') { %>
-                    <button class="category-button tooltip" onclick="filterByCategory('<%= categories_list[i].name %>')">
+                    <% if (categories_list !== null) { %>
+                        <% for(let i = 0; i < categories_list.length; i++) { %>
+                            <% if (categories_list[i].name != 'Trashed') { %>
+                    <button id="category-<%= categories_list[i].id %>" class="category-button category-button-regular tooltip" onclick="filterByCategory('<%= categories_list[i].id %>')">
                         <span class="tooltiptext"><%= categories_list[i].name %></span>
                         <img src="<%= `${categorybtns_icon_path}${categories_list[i].icon}` %>" class="category-button-icon" alt="<%= categories_list[i].name %>" >
                     </button>
+                            <% } else { %>
+                                <% trashedCategoryID = categories_list[i].id %>
+                            <% } %>
                         <% } %>
                     <% } %>
-                <% } %>
-                <button class="category-button tooltip" onclick="filterByCategory('Trashed')">
+                <button id="category-<%= trashedCategoryID %>" class="category-button category-button-regular tooltip" onclick="filterByCategory('<%= trashedCategoryID %>')">
                     <span class="tooltiptext">Trashed</span>
                     <img src="<%= `${categorybtns_icon_path}/trashed.png` %>" class="category-button-icon" alt="Trashed" />
                 </button>
+                <% } %>
             </div>
         </div>
 
@@ -214,6 +219,7 @@
         </div>
 
         <script type="text/javascript" src="/js/scripts.js"></script>
+        <script type="text/javascript">highlintCategory()</script>
         <script type="text/javascript">highlintNote()</script>
         <script type="text/javascript">highlintVersion()</script>
     <% } %>

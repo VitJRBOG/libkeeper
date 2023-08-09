@@ -1,3 +1,18 @@
+function highlintCategory() {
+    let queryString = window.location.search
+    let urlParams = new URLSearchParams(queryString)
+    if (urlParams.has('category_id')) {
+        let categoryID = urlParams.get('category_id')
+        let tag = document.getElementById(`category-${categoryID}`)
+        tag.classList.remove('category-button-regular')
+        tag.classList.add('category-button-highlinted')
+    } else {
+        let tag = document.getElementById('category-all')
+        tag.classList.remove('category-button-regular')
+        tag.classList.add('category-button-highlinted')
+    }
+}
+
 function highlintNote() {
     let queryString = window.location.search
     let urlParams = new URLSearchParams(queryString)
@@ -73,11 +88,11 @@ function toggleCategoriesListDisplay() {
     }
 }
 
-function filterByCategory(category) {
-    if (category === 'All') {
+function filterByCategory(category_id) {
+    if (category_id == '-1') {
         window.location.replace('/')
     } else {
-        let newLocation = `/?category=${encodeURIComponent(category)}`
+        let newLocation = `/?category_id=${category_id}`
         window.location.replace(newLocation)
     }
 }

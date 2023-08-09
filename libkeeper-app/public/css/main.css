@@ -172,10 +172,17 @@ input[type="radio"]:checked:hover+.category-icon-button {
     padding: 0;
     height: 75px;
     width: 75px;
-    background-color: transparent;
     border-width: 1px;
     border-radius: 5px;
     border-color: black;
+}
+
+.category-button-regular {
+    background-color: transparent;
+}
+
+.caregory-button-highlinted {
+    background-color: #b7b7b7;
 }
 
 .category-button:hover {

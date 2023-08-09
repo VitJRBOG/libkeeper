@@ -81,11 +81,11 @@ function makeHandlers(app) {
             data['notes_list'] = result
         }
 
-        if (typeof req.query.category !== 'undefined') {
-            let selectedCategory = decodeURIComponent(req.query.category)
+        if (typeof req.query.category_id !== 'undefined') {
+            let selectedCategoryID = decodeURIComponent(req.query.category_id)
             if (data['categories_list'] !== null) {
                 for (let i = 0; i < data['categories_list'].length; i++) {
-                    if (data['categories_list'][i].name === selectedCategory) {
+                    if (data['categories_list'][i].id == selectedCategoryID) {
                         data['current_category'] = data['categories_list'][i]
                     }
                 }
@@ -150,11 +150,11 @@ function makeHandlers(app) {
             data['notes_list'] = result
         }
 
-        if (typeof req.query.category !== 'undefined') {
-            let selectedCategory = decodeURIComponent(req.query.category)
+        if (typeof req.query.category_id !== 'undefined') {
+            let selectedCategoryID = decodeURIComponent(req.query.category_id)
             if (data['categories_list'] !== null) {
                 for (let i = 0; i < data['categories_list'].length; i++) {
-                    if (data['categories_list'][i].name === selectedCategory) {
+                    if (data['categories_list'][i].id == selectedCategoryID) {
                         data['current_category'] = data['categories_list'][i]
                     }
                 }
