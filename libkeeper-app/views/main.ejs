@@ -102,7 +102,7 @@
                     <% if (current_note === null) { %>
                         <% need_to_disable = true %>
                     <% } %>
-                <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } else { %> onclick="deleteNote()"<% } %>>
+                <button class="toolbtn tooltip"<% if (need_to_disable) { %> disabled<% } else { %> onclick="deleteNote('<%= current_note.categories %>')"<% } %>>
                     <span class="tooltiptext">Delete Note</span>
                     <img src="<%= toolbtns_icon_path + 'del-note.png'%>" class="toolicon" alt="Delete Note" />
                 </button>

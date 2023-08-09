@@ -288,17 +288,35 @@ function _getCategories() {
     return categories
 }
 
-function deleteNote() {
+function deleteNote(categories) {
     let queryString = window.location.search
     let urlParams = new URLSearchParams(queryString)
     if (urlParams.has('id')) {
         let note_id = urlParams.get('id')
-        fetch(`/note?id=${note_id}`, {
-            method: 'delete'
-        }).then(response => {
-            if (response.redirected) {
-                window.location.href = response.url
-            }
-        })
+        let queryURL = `/note?id=${note_id}`
+        if (categories == 'Trashed') {
+            fetch(queryURL, {
+                method: 'delete'
+            }).then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url
+                }
+            })
+        } else {
+            fetch(queryURL, {
+                method: 'put',
+                body: JSON.stringify({
+                    categories: 'Trashed',
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url
+                }
+            })
+        }
     }
 }

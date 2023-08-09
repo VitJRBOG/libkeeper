@@ -227,31 +227,32 @@ function makeHandlers(app) {
     })
 
     app.put('/note', function (req, res) {
-        let note_id = req.query.id
+        let values = {}
 
-        let full_text = req.body.full_text
-        let title = req.body.title
-        let c_date = req.body.c_date
-        let checksum = crypto.createHash('md5').update(full_text).digest('hex')
-        let categories = ''
-        if (req.body.categories.length > 0 && typeof req.body.categories !== 'undefined') {
-            categories = req.body.categories
-        } else {
-            categories = 'Uncategorised'
+        values['note_id'] = req.query.id
+
+        if (typeof req.body.full_text !== 'undefined') {
+            values['full_text'] = req.body.full_text
+            values['checksum'] = crypto.createHash('md5').update(req.body.full_text).digest('hex')
         }
 
-        let values = {
-            full_text: full_text,
-            title: title,
-            c_date: c_date,
-            checksum: checksum,
-            note_id: note_id,
-            categories: categories,
+        if (typeof req.body.title !== 'undefined') {
+            values['title'] = req.body.title
+        }
+
+        if (req.body.categories.length > 0 && typeof req.body.categories !== 'undefined') {
+            values['categories'] = req.body.categories
+        } else {
+            values['categories'] = 'Uncategorised'
+        }
+
+        if (typeof req.body.c_date !== 'undefined') {
+            values['c_date'] = req.body.c_date
         }
 
         updateNote(values)
 
-        res.redirect(303, `/note?id=${note_id}`)
+        res.redirect(303, `/note?id=${req.query.id}`)
     })
 
     app.delete('/note', function (req, res) {
