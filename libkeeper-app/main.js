@@ -123,7 +123,13 @@ function makeHandlers(app) {
     })
 
     app.get('/note', function (req, res) {
-        data['error'] = null
+        data['error'] = []
+        data['categories_list'] = null
+        data['icons_list'] = null
+        data['current_category'] = null
+        data['current_note'] = null
+        data['current_version'] = null
+        data['note_versions'] = null
 
         let result = fetchCategoriesList()
         if (typeof result == 'string') {
@@ -244,7 +250,15 @@ function makeHandlers(app) {
 
         updateNote(values)
 
-        res.redirect(303, `/note?id=${req.query.id}`)
+        let newURL = ''
+
+        if (values['categories'] === 'Trashed') {
+            newURL = '/'
+        } else {
+            newURL = `/note?id=${req.query.id}`
+        }
+
+        res.redirect(303, newURL)
     })
 
     app.delete('/note', function (req, res) {
