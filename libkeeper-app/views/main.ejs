@@ -67,7 +67,7 @@
             <div class="categories-list">
                 <% { %>
                     <% let trashedCategoryID = -1 %>
-                <button id="category-all" class="category-button category-button-regular tooltip" onclick="filterByCategory(-1)">
+                <button id="category-all" class="category-button category-button-regular tooltip" onclick="filterByCategory('-1')">
                     <span class="tooltiptext">All</span>
                     <img src="<%= `${categorybtns_icon_path}/all.png` %>" class="category-button-icon" alt="All" />
                 </button>
@@ -111,24 +111,38 @@
 
             <div class="notes-list">
                 <% if (notes_list !== null) { %>
+                    <% let need_to_show = true %>
                     <% for(let i = 0; i < notes_list.length; i++) { %>
-                        <% let link = '/note' %>
-                        <% if (current_category !== null) { %>
-                            <% link += '?category=' + encodeURIComponent(current_category.id) + '&' %>
+                        <% if (current_category === null) { %>
+                            <% if (notes_list[i].categories.includes('Trashed')) { %>
+                                <% need_to_show = false %>
+                            <% } else { %>
+                                <% need_to_show = true %>
+                            <% } %>
+                        <% } else if (!notes_list[i].categories.includes(current_category.name)) { %>
+                            <% need_to_show = false %>
                         <% } else { %>
-                            <% link += '?' %>
+                            <% need_to_show = true %>
                         <% } %>
-                        <% link += "id=" + notes_list[i].id %>
+                        <% if (need_to_show) { %>
+                            <% let link = '/note' %>
+                            <% if (current_category !== null) { %>
+                                <% link += '?category_id=' + encodeURIComponent(current_category.id) + '&' %>
+                            <% } else { %>
+                                <% link += '?' %>
+                            <% } %>
+                            <% link += "id=" + notes_list[i].id %>
                 <a href=<%= link %> class="note-link">
                     <div id="note_<%= notes_list[i].id %>" class="note-announce note-announce-regular">
-                        <% if (notes_list[i].title == "") { %>
+                            <% if (notes_list[i].title == "") { %>
                         <h3>...</h3>
-                        <% } else { %>
+                            <% } else { %>
                         <h3><%= notes_list[i].title %></h3>
-                        <% } %>
+                            <% } %>
                         <p><%= notes_list[i].c_date %></p>
                     </div>
                 </a>
+                        <% } %>
                     <% } %>
                 <% } %>
             </div>

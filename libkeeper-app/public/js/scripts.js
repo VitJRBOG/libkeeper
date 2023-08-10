@@ -89,7 +89,7 @@ function toggleCategoriesListDisplay() {
 }
 
 function filterByCategory(category_id) {
-    if (category_id == '-1') {
+    if (category_id === '-1') {
         window.location.replace('/')
     } else {
         let newLocation = `/?category_id=${category_id}`

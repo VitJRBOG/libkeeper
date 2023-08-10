@@ -159,14 +159,6 @@ function makeHandlers(app) {
                     }
                 }
             }
-            if (data['notes_list'] !== null) {
-                for (let i = 0; i < data['notes_list'].length; i++) {
-                    if (!data['notes_list'][i].categories.includes(data['current_category'].name)) {
-                        data['notes_list'].splice(i, 1)
-                        i--
-                    }
-                }
-            }
         }
 
         if (data['notes_list'] !== null) {
