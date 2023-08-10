@@ -177,13 +177,19 @@
 
             <div id="versions-list" class="versions-list" style="visibility: hidden;">
                 <% { %>
-                    <% let text = '' %>
                     <% if(note_versions !== null) { %>
+                        <% let urlToVersion = '' %>
+                        <% let text = '' %>
                         <% for(let i = 0; i < note_versions.length; i++) { %>
+                            <% urlToVersion = '/note?' %>
                             <% text = note_versions[i].full_text.substring(0, 42) %>
                             <% let note_id = note_versions[i].note_id %>
                             <% let version_id = note_versions[i].id %>
-                <a href="/note?id=<%= note_id %>&version_id=<%= version_id %>" class="version-link">
+                            <% if (current_category !== null) { %>
+                                <% urlToVersion += `category_id=${current_category.id}&` %>
+                            <% } %>
+                            <% urlToVersion += `id=${note_id}&version_id=${version_id}` %>
+                <a href="<%= urlToVersion %>" class="version-link">
                     <div id="version_<%= version_id %>" class="version-announce version-announce-regular">
                         <h5 class="version-title"><%= text %></p>
                         <p class="version-date"><%= note_versions[i].c_date %></p>
