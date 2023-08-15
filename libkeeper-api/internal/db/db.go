@@ -262,16 +262,70 @@ func SelectVersions(dbConn Connection, noteID int) ([]models.Version, error) {
 
 // UpdateNote updates an existing entry in the 'note' table and inserts a new entry in the 'version' table.
 func UpdateNote(dbConn Connection, note models.Note, version models.Version) error {
-	query := "WITH updated_note AS (UPDATE note SET title=$1 WHERE id=$2 RETURNING id) " +
-		"INSERT INTO version(full_text, c_date, checksum, note_id) " +
-		"SELECT * FROM (SELECT $3 AS full_text, $4 AS c_date, $5 AS checksum, " +
-		"(SELECT id FROM updated_note) AS note_id) AS new_version " +
-		"WHERE NOT EXISTS (SELECT id FROM version WHERE version.note_id = (SELECT id FROM updated_note) " +
-		"AND version.checksum = new_version.checksum)"
+	transaction, err := dbConn.Conn.Begin()
 
-	_, err := dbConn.Conn.Exec(query, note.Title, note.ID, version.FullText, version.CreationDate, version.Checksum)
+	defer transaction.Rollback()
+
+	result, err := transaction.Exec("UPDATE note SET title=$1 WHERE id=$2", note.Title, note.ID)
 	if err != nil {
-		return fmt.Errorf("failed to update the 'note' table entry and insert a new 'version' table entry: %s", err)
+		return fmt.Errorf("failed to update the 'note' table entry: %s", err.Error())
+	}
+
+	rowsNumber, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get affected rows: %s", err.Error())
+	}
+	if rowsNumber == 0 {
+		return fmt.Errorf("no notes found for the %d ID", note.ID)
+	}
+
+	rows, err := transaction.Query("SELECT id FROM version WHERE note_id = $1::integer AND checksum = $2",
+		note.ID, version.Checksum)
+
+	versionID := -1
+
+	for rows.Next() {
+		err := rows.Scan(&versionID)
+		if err != nil {
+			return fmt.Errorf("failed to scan rows from the 'version' table: %s", err)
+		}
+	}
+
+	if versionID == -1 {
+		query := "INSERT INTO version(full_text, c_date, checksum, note_id) VALUES($1, $2, $3, $4::integer)"
+
+		result, err = transaction.Exec(query,
+			version.FullText, version.CreationDate, version.Checksum, note.ID)
+		if err != nil {
+			return fmt.Errorf("failed to create the new 'version' table entry: %s", err.Error())
+		}
+
+		rowsNumber, err = result.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("failed to get affected rows: %s", err.Error())
+		}
+		if rowsNumber == 0 {
+			return fmt.Errorf("no versions created for the %d note ID", note.ID)
+		}
+	} else {
+		query := "UPDATE version SET c_date = $1 WHERE id = $2::integer"
+		result, err := transaction.Exec(query, version.CreationDate, versionID)
+		if err != nil {
+			return fmt.Errorf("failed to update the 'version' table entry: %s", err.Error())
+		}
+
+		rowsNumber, err := result.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("failed to get affected rows: %s", err.Error())
+		}
+		if rowsNumber == 0 {
+			return fmt.Errorf("no versions found for the %d ID", versionID)
+		}
+	}
+
+	err = transaction.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit the transaction: %s", err.Error())
 	}
 
 	return nil
